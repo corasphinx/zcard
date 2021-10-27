@@ -55,7 +55,7 @@ class HomeScreen extends React.Component {
         style={{ flex: 1 }}
       >
         <SafeAreaView style={{ flex: 1 }}>
-          <AwesomeLoading indicatorId={10} size={80} isActive={this.state.loading} />
+          <AwesomeLoading indicatorId={7} size={80} isActive={this.state.loading} />
           <Block style={styles.container}>
             <Text>HomeScreen</Text>
           </Block>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { StyleSheet, TouchableOpacity, Image, Dimensions, SafeAreaView, KeyboardAvoidingView, Linking } from 'react-native';
+import { StyleSheet, TouchableOpacity, Image, Dimensions, SafeAreaView, KeyboardAvoidingView, Linking, Animated } from 'react-native';
 import {
   Block,
   Button,
@@ -12,6 +12,7 @@ import {
 } from 'galio-framework';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AwesomeLoading from 'react-native-awesome-loading';
+import Toast from 'react-native-toast-message';
 import { colors, fonts } from '../styles';
 import { hostname } from '../constant';
 import { SignIn, SetCurrentUser } from '../redux/actions';
@@ -26,20 +27,46 @@ class SignInScreen extends React.Component {
       email: '',
       password: '',
       loading: false,
-      isError: false,
       isRemember: false,
-      errText: ''
     }
     global.user = null;
+    this.shakeEmail = new Animated.Value(0);
+    this.shakePassword = new Animated.Value(0);
   }
 
   componentDidMount = async () => {
     const user = await AsyncStorage.getItem('ZCard_User')
     if (user !== null) {
       const jsonUser = JSON.parse(user);
-      this.setState({ email: jsonUser.email, password: jsonUser.password});
+      this.setState({ email: jsonUser.email, password: jsonUser.password });
       this.signIn();
     }
+  }
+
+  startShakeEmail = () => {
+    Animated.sequence([
+      Animated.timing(this.shakeEmail, { toValue: 20, duration: 50, useNativeDriver: true }),
+      Animated.timing(this.shakeEmail, { toValue: -20, duration: 50, useNativeDriver: true }),
+      Animated.timing(this.shakeEmail, { toValue: 20, duration: 50, useNativeDriver: true }),
+      Animated.timing(this.shakeEmail, { toValue: -20, duration: 50, useNativeDriver: true }),
+      Animated.timing(this.shakeEmail, { toValue: 20, duration: 50, useNativeDriver: true }),
+      Animated.timing(this.shakeEmail, { toValue: -20, duration: 50, useNativeDriver: true }),
+      Animated.timing(this.shakeEmail, { toValue: 20, duration: 50, useNativeDriver: true }),
+      Animated.timing(this.shakeEmail, { toValue: 0, duration: 50, useNativeDriver: true })
+    ]).start();
+  }
+
+  startShakePassword = () => {
+    Animated.sequence([
+      Animated.timing(this.shakePassword, { toValue: 20, duration: 50, useNativeDriver: true }),
+      Animated.timing(this.shakePassword, { toValue: -20, duration: 50, useNativeDriver: true }),
+      Animated.timing(this.shakePassword, { toValue: 20, duration: 50, useNativeDriver: true }),
+      Animated.timing(this.shakePassword, { toValue: -20, duration: 50, useNativeDriver: true }),
+      Animated.timing(this.shakePassword, { toValue: 20, duration: 50, useNativeDriver: true }),
+      Animated.timing(this.shakePassword, { toValue: -20, duration: 50, useNativeDriver: true }),
+      Animated.timing(this.shakePassword, { toValue: 20, duration: 50, useNativeDriver: true }),
+      Animated.timing(this.shakePassword, { toValue: 0, duration: 50, useNativeDriver: true })
+    ]).start();
   }
 
   signIn = () => {
@@ -61,29 +88,39 @@ class SignInScreen extends React.Component {
         this.setState({ loading: false });
         this.props.navigation.replace('Home');
       },
-      (errText) => {
-        this.setState({
-          loading: false,
-          isError: true,
-          errText: errText
-        })
+      (msg) => {
+        this.setState({ loading: false });
+        this.startShakeEmail();
+        this.startShakePassword();
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Error',
+          text2: msg + ' 😥'
+        });
       }
     )
   }
 
   validate = () => {
     if (this.state.email == '') {
-      this.setState({
-        isError: true,
-        errText: 'Input email'
-      })
+      this.startShakeEmail();
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        text1: 'Error',
+        text2: 'Input Email. 😥'
+      });
       return false;
     }
     if (this.state.password == '') {
-      this.setState({
-        isError: true,
-        errText: 'Input password'
-      })
+      this.startShakePassword();
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        text1: 'Sorry',
+        text2: 'Input Password. 😥'
+      });
       return false;
     }
     return true;
@@ -96,7 +133,7 @@ class SignInScreen extends React.Component {
         style={{ flex: 1 }}
       >
         <SafeAreaView style={{ flex: 1 }}>
-          <AwesomeLoading indicatorId={10} size={80} isActive={this.state.loading} />
+          <AwesomeLoading indicatorId={7} size={80} isActive={this.state.loading} />
           <Block style={[styles.container, { backgroundColor: colors.backgroundLight }]}>
             <Block center row>
               <Image
@@ -109,29 +146,31 @@ class SignInScreen extends React.Component {
                 style={[styles.label, { color: colors.primary }]}
                 color={colors.primary}> Card</Text>
             </Block>
+
             <Block center>
               <Text
                 style={[styles.label, { color: colors.primary }]}
                 size={20}> Email </Text>
-              <Input
-                type='email-address'
-                style={styles.inputBox} color={colors.primary} fontSize={20}
-                icon="mail" family="antdesign" iconSize={20} iconColor={colors.primary}
-                onChangeText={(email) => this.setState({ email: email, isError: false })}
-              />
+              <Animated.View style={{ transform: [{ translateX: this.shakeEmail }] }}>
+                <Input
+                  type='email-address'
+                  style={styles.inputBox} color={colors.primary} fontSize={20}
+                  icon="mail" family="antdesign" iconSize={20} iconColor={colors.primary}
+                  onChangeText={(email) => this.setState({ email })}
+                />
+              </Animated.View>
               <Text
                 style={[styles.label, { color: colors.primary }]}
                 size={20}> Password </Text>
-              <Input
-                viewPass
-                style={styles.inputBox} password color={colors.primary} fontSize={20}
-                icon="key" family="antdesign" iconSize={20} iconColor={colors.primary}
-                onChangeText={(pwd) => this.setState({ password: pwd, isError: false })}
-              />
-              {this.state.isError && <Block center row>
-                <Icon name="warning" family="entypo" color='red' size={20} />
-                <Text size={18} color='red'> {this.state.errText}</Text>
-              </Block>}
+              <Animated.View style={{ transform: [{ translateX: this.shakePassword }] }}>
+                <Input
+                  viewPass
+                  style={styles.inputBox} password color={colors.primary} fontSize={20}
+                  icon="key" family="antdesign" iconSize={20} iconColor={colors.primary}
+                  onChangeText={(password) => this.setState({ password })}
+                />
+              </Animated.View>
+              
               <Block style={styles.remember}>
                 <Checkbox color={colors.primary} initialValue={this.state.isRemember}
                   label="Remember me" labelStyle={{ color: colors.primary, fontSize: 20 }}
@@ -144,7 +183,7 @@ class SignInScreen extends React.Component {
                 icon="login" iconFamily="antdesign" iconSize={25}
                 textStyle={{ fontSize: 25 }}
                 onPress={() => this.signIn()}
-              >Sign In</Button>
+              > Sign In</Button>
               <TouchableOpacity
                 onPress={() => Linking.openURL(hostname)}
               >
@@ -156,6 +195,7 @@ class SignInScreen extends React.Component {
               </TouchableOpacity>
             </Block>
           </Block>
+          <Toast ref={(ref) => Toast.setRef(ref)} />
         </SafeAreaView>
       </KeyboardAvoidingView >
     );

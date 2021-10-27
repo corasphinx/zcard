@@ -65,7 +65,7 @@ export function SignIn(dispatch, req, successcb, errorcb) {
                 SetCurrentUser(dispatch, res.data.data.Account);
                 if (successcb) successcb(res.data.data.Account);
             } else {
-                if (errorcb) errorcb(res.data.msg);
+                if (errorcb) errorcb(res.data.message);
             }
         })
         .catch(error => {
