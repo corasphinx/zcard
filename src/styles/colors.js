@@ -9,13 +9,13 @@ const blueVersion = {
   blue: '#5A81F7',
   black: '#000000',
   green: '#00a367',
-  yellow: '#ffc247',
+  yellow: '#fff68b',
   gold: '#FFD700',
   pink: '#ff6983',
   purple: '#7a44cf',
   background: '#EEEEEE',
   backgroundLight: '#FFFFFF',
-  border: '#445368'
+  border: '#acacac'
 };
 
 export default blueVersion;

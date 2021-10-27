@@ -37,6 +37,32 @@ export default StyleSheet.create({
     alignItems: 'center',
     borderBottomColor: 'grey',
     paddingHorizontal: theme.SIZES.BASE * 0.5,
-    backgroundColor: colors.header
+  },
+  collapseTitle:{
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+    backgroundColor: colors.primaryLight,
+    padding: 8,
+    marginTop:8,
+    alignItems:'center'
+  },
+  listRow: {
+    flex: 1,
+    flexDirection: 'row',
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 8,
+    marginVertical: 2,
+    padding: 8,
+    backgroundColor: colors.background
+  },
+  listRowBack: {
+    paddingVertical: 1,
+    paddingHorizontal: 5,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 8,
+    marginVertical: 2,
+    alignItems: 'flex-end'
   },
 });

@@ -26,7 +26,7 @@ class SignInScreen extends React.Component {
     this.state = {
       email: '',
       password: '',
-      loading: false,
+      loading: true,
       isRemember: false,
     }
     global.user = null;
@@ -40,6 +40,8 @@ class SignInScreen extends React.Component {
       const jsonUser = JSON.parse(user);
       this.setState({ email: jsonUser.email, password: jsonUser.password });
       this.signIn();
+    } else {
+      this.setState({ loading: false });
     }
   }
 
@@ -170,7 +172,7 @@ class SignInScreen extends React.Component {
                   onChangeText={(password) => this.setState({ password })}
                 />
               </Animated.View>
-              
+
               <Block style={styles.remember}>
                 <Checkbox color={colors.primary} initialValue={this.state.isRemember}
                   label="Remember me" labelStyle={{ color: colors.primary, fontSize: 20 }}
