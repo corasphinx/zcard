@@ -88,7 +88,7 @@ class SignInScreen extends React.Component {
 
         global.user = user;
         this.setState({ loading: false });
-        this.props.navigation.replace('Home');
+        this.props.navigation.replace('CharterPricing');
       },
       (msg) => {
         this.setState({ loading: false });

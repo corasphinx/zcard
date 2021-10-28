@@ -182,6 +182,7 @@ class HomeScreen extends React.Component {
             color={colors.purple}
             icon='handshake-o' iconFamily='Font-Awesome' iconSize={18}
             textStyle={{ fontSize: 18 }}
+            onPress={() => this.props.navigation.navigate('CharterPricing')}
           > Join Program</Button>
         </Block>
       </Block>
@@ -199,6 +200,7 @@ class HomeScreen extends React.Component {
             color={colors.green}
             icon='plussquareo' iconFamily='AntDesign' iconSize={18}
             textStyle={{ fontSize: 18 }}
+            onPress={() => this.props.navigation.navigate('CharterPricing')}
           > Create Free ZCard</Button>
         </Block>
       </Block>
@@ -273,7 +275,7 @@ class HomeScreen extends React.Component {
   }
 
   renderEnterpriseCards = () => {
-    const {user_partner_profiles, isExpandedEnterpriseCards } = this.state;
+    const { user_partner_profiles, isExpandedEnterpriseCards } = this.state;
 
     return <Collapse
       isExpanded={isExpandedEnterpriseCards}
@@ -304,7 +306,7 @@ class HomeScreen extends React.Component {
                   <Text bold size={18} color={colors.primary}> {data.item._name}</Text>
                   <Text italic size={16} color={colors.primaryLight}> {this.millisecondsToStr(data.item._created_time)}</Text>
                 </Block>
-                <Block flex style={{ alignItems: 'flex-end'}}>
+                <Block flex style={{ alignItems: 'flex-end' }}>
                   <Text size={16} color={colors.primary} > {data.item.partner_name}</Text>
                   <Text size={16} color={colors.primary} > {data.item._card_cost} / Year</Text>
                 </Block>
@@ -331,8 +333,6 @@ class HomeScreen extends React.Component {
   }
 
   render = () => {
-    const { currentUser, navigation, route } = this.props;
-
     return (
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : null}

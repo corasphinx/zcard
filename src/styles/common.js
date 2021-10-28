@@ -65,4 +65,10 @@ export default StyleSheet.create({
     marginVertical: 2,
     alignItems: 'flex-end'
   },
+  card: {
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.border,
+    margin: 10
+  }
 });

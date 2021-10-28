@@ -14,6 +14,7 @@ import { Block, Icon, Text } from 'galio-framework';
 import { colors } from '../styles';
 import SignInScreen from '../pages/SignInScreen';
 import HomeScreen from '../pages/HomeScreen';
+import CharterPricingScreen from '../pages/CharterPricingScreen';
 
 const drawerData = [
   {
@@ -73,6 +74,11 @@ class App extends React.Component {
         <Stack.Screen
           name="Home"
           component={HomeScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="CharterPricing"
+          component={CharterPricingScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
