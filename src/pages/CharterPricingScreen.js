@@ -3,37 +3,26 @@ import { connect } from 'react-redux';
 
 import {
   StyleSheet,
-  TouchableOpacity,
-  Image,
   Dimensions,
   SafeAreaView,
   KeyboardAvoidingView,
   ScrollView,
-  ActivityIndicator,
-  TextInput
 } from 'react-native';
 
 import {
   Block,
   Button,
   Text,
-  Icon,
-  Input,
-  theme,
 } from 'galio-framework';
 import AwesomeLoading from 'react-native-awesome-loading';
 import Toast from 'react-native-toast-message';
-import { Collapse, CollapseHeader, CollapseBody } from 'accordion-collapse-react-native';
 import HTMLView from 'react-native-htmlview';
-import { SwipeListView } from 'react-native-swipe-list-view';
 import { colors, commonStyles } from '../styles';
 
 import {
   CallClassFunction,
   CallController,
 } from '../redux/actions';
-
-import { hostname } from '../constant';
 
 const { width, height } = Dimensions.get('screen');
 
@@ -126,7 +115,7 @@ class CharterPricingScreen extends React.Component {
             color={colors.primary}
             icon='checkcircleo' iconFamily='AntDesign' iconSize={18}
             textStyle={{ fontSize: 18 }}
-            onPress={() => alert('deluxe-zcard-start is comming soon')}
+            onPress={() => alert('mobile stripe is comming soon')}
           > Get Started</Button>
         </Block>
       </Block>
@@ -150,7 +139,7 @@ class CharterPricingScreen extends React.Component {
               color={colors.primary}
               icon='checkcircleo' iconFamily='AntDesign' iconSize={18}
               textStyle={{ fontSize: 18 }}
-              onPress={() => alert('charter-join.php is comming soon')}
+              onPress={() => this.props.navigation.navigate('CharterJoin', {CharterProductData: charter_product_data})}
             >{charter_product_data.buy_text}</Button>
           </Block>
         </Block>

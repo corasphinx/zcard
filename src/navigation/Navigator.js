@@ -15,6 +15,7 @@ import { colors } from '../styles';
 import SignInScreen from '../pages/SignInScreen';
 import HomeScreen from '../pages/HomeScreen';
 import CharterPricingScreen from '../pages/CharterPricingScreen';
+import CharterJoinScreen from '../pages/CharterJoinScreen';
 
 const drawerData = [
   {
@@ -79,6 +80,11 @@ class App extends React.Component {
         <Stack.Screen
           name="CharterPricing"
           component={CharterPricingScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="CharterJoin"
+          component={CharterJoinScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
