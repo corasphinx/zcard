@@ -5,6 +5,7 @@ import TemplateSettingsScreen from '../pages/EditCard/TemplateSettingsScreen';
 import CardSettingsScreen from '../pages/EditCard/CardSettingsScreen';
 import CustomURLSScreen from '../pages/EditCard/CustomURLSScreen';
 import MainImagesScreen from '../pages/EditCard/MainImagesScreen';
+import PickerScreen from '../pages/EditCard/PickerScreen';
 import { colors, fonts } from '../styles';
 
 const headerLeftComponent = (props) => {
@@ -72,6 +73,18 @@ const StackNavigationData = [
     title: 'Main Images & Photos',
     component: MainImagesScreen,
     headerLeft: null,
+    headerBackground: { source: headerBackground },
+    headerTitleStyle: {
+      fontFamily: fonts.primaryRegular,
+      color: colors.white,
+      fontSize: 18,
+    },
+  },
+  {
+    name: 'ColorPicker',
+    title: 'Pick Color',
+    component: PickerScreen,
+    headerLeft: headerLeftComponent,
     headerBackground: { source: headerBackground },
     headerTitleStyle: {
       fontFamily: fonts.primaryRegular,
