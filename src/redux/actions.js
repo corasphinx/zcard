@@ -1,6 +1,7 @@
 import { Client } from './api';
 import {
     SET_CURRENT_USER,
+    SET_SELECTED_ZCARD,
 } from './types';
 
 function convertParams(req) {
@@ -15,6 +16,13 @@ export function SetCurrentUser(dispatch, user) {
     dispatch({
         type: SET_CURRENT_USER,
         user: user
+    })
+}
+
+export function SetSeletedZCard(dispatch, zcard) {
+    dispatch({
+        type: SET_SELECTED_ZCARD,
+        zcard: zcard
     })
 }
 
@@ -42,6 +50,27 @@ export function CallClassFunction(className, funcName, reqArray, successcb, erro
     Client.post(`/Chatter/App/call_class_function.php`,
         convertParams({
             class: className,
+            func: funcName,
+            params: JSON.stringify(reqArray)
+        }))
+        .then(res => {
+            if (res.data.success) {
+                if (successcb) successcb(res.data.data);
+            } else {
+                if (errorcb) errorcb(res.data.message);
+            }
+        })
+        .catch(error => {
+            console.error(`ACTION : ${funcName} error => `, error);
+            if (errorcb) errorcb(error);
+        });
+}
+
+export function CallZCardClassFunction(id, funcName, reqArray, successcb, errorcb) {
+
+    Client.post(`/App/call_zcard_class_function.php`,
+        convertParams({
+            id: id,
             func: funcName,
             params: JSON.stringify(reqArray)
         }))

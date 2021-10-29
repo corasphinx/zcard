@@ -15,7 +15,8 @@ const blueVersion = {
   purple: '#7a44cf',
   background: '#EEEEEE',
   backgroundLight: '#FFFFFF',
-  border: '#acacac'
+  border: '#acacac',
+  header: '#5a8dee',
 };
 
 export default blueVersion;

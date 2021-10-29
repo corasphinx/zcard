@@ -31,6 +31,7 @@ import {
   SignOut,
   CallClassFunction,
   CallController,
+  SetSeletedZCard,
 } from '../redux/actions';
 
 import { hostname } from '../constant';
@@ -206,6 +207,11 @@ class HomeScreen extends React.Component {
       </Block>
   }
 
+  editZcard = (zcard) => {
+    this.props.setSeletedZCard(zcard);
+    this.props.navigation.navigate('EditCard', {zcard});
+  }
+
   renderMyCards = () => {
     const { zcards, isExpandedMyCards } = this.state;
 
@@ -252,7 +258,7 @@ class HomeScreen extends React.Component {
           renderHiddenItem={(data, rowMap) => (
             <Block style={commonStyles.listRowBack} flex>
               <Block row>
-                <TouchableOpacity onPress={() => alert('edit-card.php page is comming')}>
+                <TouchableOpacity onPress={() => this.editZcard(data.item)}>
                   <Block style={{ height: '100%', width: 75, backgroundColor: 'green', alignItems: 'center', justifyContent: 'center' }}>
                     <Icon name="trash" family="entypo" color={colors.white} size={15} />
                     <Text size={15} color={colors.white}>Edit</Text>
@@ -364,9 +370,10 @@ function mapDispatchToProps(dispatch) {
     signOut: () => SignOut(),
     GetUserZCards: (className, funcName, reqArray, successcb, errorcb) => CallClassFunction(className, funcName, reqArray, successcb, errorcb),
     listPartnerProfilesByAccount: (className, funcName, reqArray, successcb, errorcb) => CallClassFunction(className, funcName, reqArray, successcb, errorcb),
-    fetchZCardEntry: (className, funcName, reqArray, successcb, errorcb, getData) => CallController(className, funcName, reqArray, successcb, errorcb, getData),
+    fetchZCardEntry: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
     actualTotalZBucks: (className, funcName, reqArray, successcb, errorcb) => CallClassFunction(className, funcName, reqArray, successcb, errorcb),
     getZCardCountExpiringSoon: (className, funcName, reqArray, successcb, errorcb) => CallClassFunction(className, funcName, reqArray, successcb, errorcb),
+    setSeletedZCard:(zcard) => SetSeletedZCard(dispatch, zcard),
   };
 }
 export default connect(

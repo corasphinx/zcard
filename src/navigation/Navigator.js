@@ -27,9 +27,51 @@ const drawerData = [
 const Drawer = createDrawerNavigator();
 
 const CustomDrawerContent = (props) => {
+  const { zcard } = props;
+  
   return (
     <DrawerContentScrollView {...props} style={{ padding: 0 }}>
-      {drawerData.map((item, idx) => (
+      <DrawerItem
+        key={`drawer_item-0`}
+        label={() => (
+          <View style={styles.menuLabelFlex}>
+            <Icon name='setting' family='AntDesign' color={colors.primary} size={20} />
+            <Text style={[styles.menuTitle, { color: colors.primary }]}>Template Settings</Text>
+          </View>
+        )}
+        onPress={() => props.navigation.navigate('TemplateSettings')}
+      />
+      <DrawerItem
+        key={`drawer_item-1`}
+        label={() => (
+          <View style={styles.menuLabelFlex}>
+            <Icon name='creditcard' family='AntDesign' color={colors.primary} size={20} />
+            <Text style={[styles.menuTitle, { color: colors.primary }]}>Card Settings</Text>
+          </View>
+        )}
+        onPress={() => props.navigation.navigate('CardSettings')}
+      />
+      {zcard != null && zcard.enable_icon_banner == 1 && <DrawerItem
+        key={`drawer_item-2`}
+        label={() => (
+          <View style={styles.menuLabelFlex}>
+            <Icon name='isv' family='AntDesign' color={colors.primary} size={20} />
+            <Text style={[styles.menuTitle, { color: colors.primary }]}>Custom URLS & Icons</Text>
+          </View>
+        )}
+        onPress={() => props.navigation.navigate('CustomURLS')}
+      />}
+      <DrawerItem
+        key={`drawer_item-3`}
+        label={() => (
+          <View style={styles.menuLabelFlex}>
+            <Icon name='picture' family='AntDesign' color={colors.primary} size={20} />
+            <Text style={[styles.menuTitle, { color: colors.primary }]}>Main Images & Photos</Text>
+          </View>
+        )}
+        onPress={() => props.navigation.navigate('MainImages')}
+      />
+      {/* {drawerData.map((item, idx) => (
         <DrawerItem
           key={`drawer_item-${idx + 1}`}
           label={() => (
@@ -40,22 +82,22 @@ const CustomDrawerContent = (props) => {
           )}
           onPress={() => props.navigation.navigate(item.name)}
         />
-      ))}
+      ))} */}
 
     </DrawerContentScrollView>
   )
 };
 
-const SettingStack = (props) => {
-  let user = props.route.params ? props.route.params.user : {};
+const EditCardStack = (props) => {
+  let zcard = props.route.params.zcard;
   return (
     <Drawer.Navigator
       drawerStyle={{
         backgroundColor: colors.backgroundLight,
       }}
-      drawerContent={(props) => <CustomDrawerContent {...props} user={user} />}
+      drawerContent={(props) => <CustomDrawerContent {...props} zcard={zcard} />}
     >
-      <Drawer.Screen name="Homes" component={NavigatorView} />
+      <Drawer.Screen name="EditCard" component={NavigatorView} />
     </Drawer.Navigator>
   )
 }
@@ -85,6 +127,11 @@ class App extends React.Component {
         <Stack.Screen
           name="CharterJoin"
           component={CharterJoinScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="EditCard"
+          component={EditCardStack}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
