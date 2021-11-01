@@ -380,7 +380,6 @@ class CardSettingsScreen extends React.Component {
       },
       tagsColor: colors.primaryLight,
       tagsText: '#fff',
-      oldTags: [],
       social_enabled: true,
       isPassword: false,
       seo_indexing: false,
@@ -401,24 +400,17 @@ class CardSettingsScreen extends React.Component {
       state_region: '',
       country: '',
       single_address_field: false,
-      zcard_password:'',
+      zcard_password: '',
     }
   }
 
   componentDidMount = () => {
     const { selectedZCard } = this.props;
 
-    let oldTags;
-    if (selectedZCard.tags.indexOf(', ') > 0)
-      oldTags = selectedZCard.tags.split(', ');
-    else
-      oldTags = selectedZCard.tags.split(',');
-
     this.setState({
-      oldTags: oldTags,
       tags: {
         tag: '',
-        tagsArray: oldTags
+        tagsArray: selectedZCard.tags.split(',')
       },
       zc_desc: selectedZCard.zc_desc,
       zc_name: selectedZCard.zc_name,
@@ -508,26 +500,40 @@ class CardSettingsScreen extends React.Component {
       zc_email,
       zc_phone,
       isPassword,
-      zcard_password
+      zcard_password,
+      social_enabled,
+      tags,
     } = this.state;
 
     this.setState({ saving: true });
 
-    if(isPassword){
+    // save password
+    if (isPassword) {
       this.props.setPassword(
         `/edit-zcard/set_password.php?zcard_id=${selectedZCard.id}`,
-        {password:zcard_password},
-        (msg)=>console.info(msg),
-        (msg)=>console.info(msg)
+        { password: zcard_password },
+        (msg) => console.info(msg),
+        (msg) => console.info(msg)
       )
-    }else{
+    } else {
       this.props.clearPassword(
         `/Zcard/clear_password.php?id=${selectedZCard.id}`,
-        (msg)=>console.info(msg),
-        (msg)=>console.info(msg)
+        (msg) => console.info(msg),
+        (msg) => console.info(msg)
       )
     }
 
+    // save social tags
+    this.props.updateTags(
+      `/Zcard/update_tags.php?id=${selectedZCard.id}`,
+      {
+        tags: tags.tagsArray
+      },
+      (msg) => console.info(msg),
+      (msg) => console.info(msg),
+    );
+
+    // save data
     this.props.update_card_settings(
       '/Zcard/update_card_settings.php',
       {
@@ -542,6 +548,7 @@ class CardSettingsScreen extends React.Component {
         toggle_force_font_color: force_font_color ? 1 : 0,
         card_font_color: card_font_color,
         toggle_enable_icon_banner: enable_icon_banner ? 1 : 0,
+        social_enabled: social_enabled ? 1 : 0,
         first_name: first_name,
         last_name: last_name,
         single_address_field: single_address_field,
@@ -708,7 +715,7 @@ class CardSettingsScreen extends React.Component {
                   <TagInput
                     updateState={this.updateTagState}
                     tags={tags}
-                    placeholder="inpute interests..."
+                    placeholder="input tags..."
                     label='Type in anything and then press Enter or type in a Comma (,) to add tags!'
                     labelStyle={{ color: '#fff' }}
                     leftElement={<Icon name='tags' family='AntDesign' size={18} color={tagsText} />}
@@ -976,7 +983,8 @@ function mapDispatchToProps(dispatch) {
     update_card_settings: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
     setSelectedZCard: (zcard) => SetSelectedZCard(dispatch, zcard),
     setPassword: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
-    clearPassword: (controller,successcb, errorcb) => ClearPassword(controller, successcb, errorcb),
+    clearPassword: (controller, successcb, errorcb) => ClearPassword(controller, successcb, errorcb),
+    updateTags: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
   };
 }
 export default connect(
