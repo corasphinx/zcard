@@ -407,7 +407,7 @@ class CardSettingsScreen extends React.Component {
 
   componentDidMount = () => {
     const { selectedZCard } = this.props;
-console.info(selectedZCard)
+
     this.setState({
       tags: {
         tag: '',

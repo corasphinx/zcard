@@ -44,7 +44,7 @@ class HomeScreen extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      loading: false,
+      loading: true,
       zcards: [],
       user_partner_profiles: [],
       totalZBucks: 0,
@@ -102,6 +102,7 @@ class HomeScreen extends React.Component {
                           zcard.ProductInfo.cost_term_text = ProductInfo.cost_term_text;
                         }
                         this.setState({ zcards: [...this.state.zcards, zcard] });
+                        if (zcardIds.length == this.state.zcards.length) this.setState({ loading: false });
                       },
                       (msg) => { this.setState({ zcards: [...this.state.zcards, zcard] }); }
                     );
@@ -112,6 +113,7 @@ class HomeScreen extends React.Component {
 
               },
               (msg) => {
+                this.setState({ loading: false });
                 Toast.show({
                   type: 'error',
                   position: 'top',
@@ -124,6 +126,7 @@ class HomeScreen extends React.Component {
           });
       },
       (msg) => {
+        this.setState({ loading: false });
         Toast.show({
           type: 'error',
           position: 'top',
@@ -137,9 +140,8 @@ class HomeScreen extends React.Component {
       'Partner',
       'listPartnerProfilesByAccount',
       [currentUser.id],
-      (user_partner_profiles) => { this.setState({ loading: false, user_partner_profiles: user_partner_profiles }); },
+      (user_partner_profiles) => { this.setState({ user_partner_profiles: user_partner_profiles }); },
       (msg) => {
-        this.setState({ loading: false });
         Toast.show({
           type: 'error',
           position: 'top',
@@ -164,7 +166,6 @@ class HomeScreen extends React.Component {
           });
         }
       );
-
     this.props.getZCardCountExpiringSoon(
       'Account',
       'getZCardCountExpiringSoon',
@@ -179,6 +180,7 @@ class HomeScreen extends React.Component {
           });
       },
       (msg) => {
+        if(msg != undefined)
         Toast.show({
           type: 'error',
           position: 'top',
@@ -385,7 +387,7 @@ class HomeScreen extends React.Component {
   }
 
   render = () => {
-    const { zcards, user_partner_profiles } = this.state;
+    const { zcards, user_partner_profiles, loading } = this.state;
 
     return (
       <KeyboardAvoidingView
@@ -393,13 +395,13 @@ class HomeScreen extends React.Component {
         style={{ flex: 1 }}
       >
         <SafeAreaView style={{ flex: 1 }}>
-          <AwesomeLoading indicatorId={7} size={80} isActive={this.state.loading} />
           <Block style={styles.container}>
             <ScrollView nestedScrollEnabled={true}>
               {this.renderSlogan()}
-              {zcards.length == 0 && this.renderActiveCard()}
-              {zcards.length > 0 && this.renderMyCards()}
-              {user_partner_profiles.length > 0 && this.renderEnterpriseCards()}
+              {loading && <ActivityIndicator size="large" color="green" animating={loading} />}
+              {zcards.length == 0 && !loading && this.renderActiveCard()}
+              {zcards.length > 0 && !loading && this.renderMyCards()}
+              {user_partner_profiles.length > 0 && !loading && this.renderEnterpriseCards()}
             </ScrollView>
           </Block>
           <Toast ref={(ref) => Toast.setRef(ref)} />
