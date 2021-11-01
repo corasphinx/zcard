@@ -67,7 +67,6 @@ export function CallClassFunction(className, funcName, reqArray, successcb, erro
 }
 
 export function CallZCardClassFunction(id, funcName, reqArray, successcb, errorcb) {
-
     Client.post(`/App/call_zcard_class_function.php`,
         convertParams({
             id: id,
@@ -109,5 +108,22 @@ export function SignOut() {
         })
         .catch(error => {
             console.error("ACTION : SignOut error => ", error);
+        });
+}
+
+export function SaveTab(controller, req, successcb, errorcb) {
+    Client.post(controller, req)
+        .then(res => {
+            if (res.data.success) {
+                if (successcb) {
+                    successcb(res.data.message)
+                }
+            } else {
+                if (errorcb) errorcb(res.data.message);
+            }
+        })
+        .catch(error => {
+            console.error(`ACTION : ${controller} error => `, error);
+            if (errorcb) errorcb(error);
         });
 }
