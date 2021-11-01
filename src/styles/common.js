@@ -46,6 +46,13 @@ export default StyleSheet.create({
     marginTop:8,
     alignItems:'center'
   },
+  collapseBody:{
+    padding:10,
+    borderColor:colors.border, 
+    backgroundColor:colors.backgroundLight,
+    borderBottomLeftRadius:8,
+    borderBottomRightRadius:8,
+  },
   listRow: {
     flex: 1,
     flexDirection: 'row',
