@@ -31,7 +31,7 @@ import {
   SignOut,
   CallClassFunction,
   CallController,
-  SetSeletedZCard,
+  SetSelectedZCard,
 } from '../redux/actions';
 
 import { hostname } from '../constant';
@@ -44,7 +44,7 @@ class HomeScreen extends React.Component {
     this.state = {
       loading: false,
       zcards: [],
-      user_partner_profiles: null,
+      user_partner_profiles: [],
       totalZBucks: 0,
       isExpandedMyCards: false,
       isExpandedEnterpriseCards: false
@@ -208,8 +208,8 @@ class HomeScreen extends React.Component {
   }
 
   editZcard = (zcard) => {
-    this.props.setSeletedZCard(zcard);
-    this.props.navigation.navigate('EditCard', {zcard});
+    this.props.setSelectedZCard(zcard);
+    this.props.navigation.navigate('EditCard', { zcard });
   }
 
   renderMyCards = () => {
@@ -338,7 +338,23 @@ class HomeScreen extends React.Component {
     </Collapse>
   }
 
+  renderActiveCard = () => {
+    return <Block style={[styles.card, commonStyles.shadow]}>
+      <Text bold size={20} color={colors.primary}>Uh-Oh, It looks like you don't have any Zcards in your account right now.</Text>
+      <Block style={{ alignItems: 'flex-end' }}>
+        <Button
+          color={colors.pink}
+          textStyle={{ fontSize: 18 }}
+          style={{width: 250}}
+          onPress={() => this.props.navigation.navigate('CharterPricing')}
+        > Activate your Zcard Now</Button>
+      </Block>
+    </Block>
+  }
+
   render = () => {
+    const { zcards, user_partner_profiles } = this.state;
+
     return (
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : null}
@@ -349,8 +365,9 @@ class HomeScreen extends React.Component {
           <Block style={styles.container}>
             <ScrollView nestedScrollEnabled={true}>
               {this.renderSlogan()}
-              {this.renderMyCards()}
-              {this.renderEnterpriseCards()}
+              {zcards.length == 0 && this.renderActiveCard()}
+              {zcards.length > 0 && this.renderMyCards()}
+              {user_partner_profiles.length > 0 && this.renderEnterpriseCards()}
             </ScrollView>
           </Block>
           <Toast ref={(ref) => Toast.setRef(ref)} />
@@ -373,7 +390,7 @@ function mapDispatchToProps(dispatch) {
     fetchZCardEntry: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
     actualTotalZBucks: (className, funcName, reqArray, successcb, errorcb) => CallClassFunction(className, funcName, reqArray, successcb, errorcb),
     getZCardCountExpiringSoon: (className, funcName, reqArray, successcb, errorcb) => CallClassFunction(className, funcName, reqArray, successcb, errorcb),
-    setSeletedZCard:(zcard) => SetSeletedZCard(dispatch, zcard),
+    setSelectedZCard: (zcard) => SetSelectedZCard(dispatch, zcard),
   };
 }
 export default connect(

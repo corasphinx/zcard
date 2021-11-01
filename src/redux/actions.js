@@ -19,7 +19,7 @@ export function SetCurrentUser(dispatch, user) {
     })
 }
 
-export function SetSeletedZCard(dispatch, zcard) {
+export function SetSelectedZCard(dispatch, zcard) {
     dispatch({
         type: SET_SELECTED_ZCARD,
         zcard: zcard

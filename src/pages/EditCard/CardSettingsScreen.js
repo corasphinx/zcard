@@ -32,6 +32,7 @@ import { Dropdown } from 'react-native-material-dropdown';
 import {
   CallClassFunction,
   CallController,
+  SetSelectedZCard,
 } from '../../redux/actions';
 
 import { hostname } from '../constant';
@@ -417,6 +418,10 @@ class CardSettingsScreen extends React.Component {
         tag: '',
         tagsArray: oldTags
       },
+      zc_desc: selectedZCard.zc_desc,
+      zc_name: selectedZCard.zc_name,
+      zc_card_type: selectedZCard.card_type,
+      zcard_theme_id: selectedZCard.theme_id,
       social_enabled: selectedZCard.social_enabled == 1,
       isPassword: selectedZCard.password !== null,
       seo_indexing: selectedZCard.seo_indexing == 1,
@@ -477,7 +482,97 @@ class CardSettingsScreen extends React.Component {
   }
 
   save = () => {
+    const { selectedZCard } = this.props;
+    const {
+      seo_indexing,
+      zc_desc,
+      zc_name,
+      zc_card_type,
+      zcard_theme_id,
+      force_color,
+      card_color,
+      force_font_color,
+      card_font_color,
+      enable_icon_banner,
+      first_name,
+      last_name,
+      single_address_field,
+      street_address,
+      town_city,
+      state_region,
+      postal_code,
+      country,
+      zc_email,
+      zc_phone
+    } = this.state;
+
     this.setState({ saving: true });
+    this.props.update_card_settings(
+      '/Zcard/update_card_settings.php',
+      {
+        id: selectedZCard.id,
+        toggle_seo_indexing: seo_indexing,
+        zc_desc: zc_desc,
+        zc_name: zc_name,
+        zc_card_type: zc_card_type,
+        zcard_theme_id: zcard_theme_id,
+        toggle_force_color: force_color,
+        card_color: card_color,
+        toggle_force_font_color: force_font_color,
+        card_font_color: card_font_color,
+        toggle_enable_icon_banner: enable_icon_banner,
+        first_name: first_name,
+        last_name: last_name,
+        single_address_field: single_address_field,
+        street_address: street_address,
+        town_city: town_city,
+        state_region: state_region,
+        postal_code: postal_code,
+        select_country: country,
+        email: zc_email,
+        phone: zc_phone
+      },
+      (msg) => {
+        let updatedZCard = selectedZCard;
+        updatedZCard.toggle_seo_indexing = seo_indexing;
+        updatedZCard.zc_desc = zc_desc;
+        updatedZCard.zc_name = zc_name;
+        updatedZCard.zc_card_type = zc_card_type;
+        updatedZCard.zcard_theme_id = zcard_theme_id;
+        updatedZCard.toggle_force_color = force_color;
+        updatedZCard.card_color = card_color;
+        updatedZCard.toggle_force_font_color = force_font_color;
+        updatedZCard.card_font_color = card_font_color;
+        updatedZCard.toggle_enable_icon_banner = enable_icon_banner;
+        updatedZCard.first_name = first_name;
+        updatedZCard.last_name = last_name;
+        updatedZCard.single_address_field = single_address_field;
+        updatedZCard.street_address = street_address;
+        updatedZCard.town_city = town_city;
+        updatedZCard.state_region = state_region;
+        updatedZCard.postal_code = postal_code;
+        updatedZCard.select_country = country;
+        updatedZCard.email = zc_email;
+        updatedZCard.phone = zc_phone;
+        this.props.setSelectedZCard(updatedZCard);
+        this.setState({ saving: false });
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          text1: 'Sucess',
+          text2: msg + ' 🎊'
+        });
+      },
+      (msg) => {
+        this.setState({ saving: false });
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Error',
+          text2: msg + ' 😥'
+        });
+      },
+    );
   }
 
   render = () => {
@@ -824,7 +919,7 @@ class CardSettingsScreen extends React.Component {
                     pickerStyle={{ borderRadius: 10, height: 300 }}
                     containerStyle={{ width: width - 20 }}
                     data={countryList}
-                    onChangeText={(v, idx, data) => this.setState({ country: idx + 1 })}
+                    onChangeText={(v, idx, data) => this.setState({ country: v })}
                   />
                 </Block>}
               </Block>
@@ -856,7 +951,8 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     listPartnerProfilesByAccount: (className, funcName, reqArray, successcb, errorcb) => CallClassFunction(className, funcName, reqArray, successcb, errorcb),
-    fetchZCardEntry: (className, funcName, reqArray, successcb, errorcb, getData) => CallController(className, funcName, reqArray, successcb, errorcb, getData),
+    update_card_settings: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
+    setSelectedZCard: (zcard) => SetSelectedZCard(dispatch, zcard),
   };
 }
 export default connect(
