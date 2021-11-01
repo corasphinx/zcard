@@ -23,6 +23,7 @@ import {
 } from 'galio-framework';
 import AwesomeLoading from 'react-native-awesome-loading';
 import Toast from 'react-native-toast-message';
+import HTMLView from 'react-native-htmlview';
 import { Collapse, CollapseHeader, CollapseBody } from 'accordion-collapse-react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { colors, commonStyles } from '../styles';
@@ -32,6 +33,7 @@ import {
   CallClassFunction,
   CallController,
   SetSelectedZCard,
+  CallZCardClassFunction,
 } from '../redux/actions';
 
 import { hostname } from '../constant';
@@ -79,8 +81,35 @@ class HomeScreen extends React.Component {
                 } else {
                   zcard.expiration_date = 'No expiration date.';
                 };
+                this.props.fetchProduct(
+                  'Chatter/App/fetchProduct.php',
+                  { id: zcard.product_id },
+                  (ProductInfo) => {
+                    zcard.ProductInfo = ProductInfo;
 
-                this.setState({ zcards: [...this.state.zcards, zcard] });
+                    this.props.zcard_zmodule_total_monthly(
+                      zcard.id,
+                      'zcard_zmodule_total_monthly',
+                      [],
+                      (zcard_zmodule_monthly_cost) => {
+                        if (ProductInfo.cost_per_term <= 0) {
+                          if (zcard_zmodule_monthly_cost > 0) {
+                            zcard.ProductInfo.cost_term_text = "$" + zcard_zmodule_monthly_cost + "/ 30 Days";
+                          } else {
+                            zcard.ProductInfo.cost_term_text = ProductInfo.cost_term_text;
+                          }
+                        } else {
+                          zcard.ProductInfo.cost_term_text = ProductInfo.cost_term_text;
+                        }
+                        this.setState({ zcards: [...this.state.zcards, zcard] });
+                      },
+                      (msg) => { this.setState({ zcards: [...this.state.zcards, zcard] }); }
+                    );
+                  },
+                  (msg) => { this.setState({ zcards: [...this.state.zcards, zcard] }); },
+                  true,
+                );
+
               },
               (msg) => {
                 Toast.show({
@@ -250,7 +279,10 @@ class HomeScreen extends React.Component {
                   {data.item.expiration_date != 'Renew' && <Text italic size={16} color={colors.primaryLight}> {data.item.expiration_date}</Text>}
                 </Block>
                 {(data.item.ProductInfo != null || data.item.ProductInfo != undefined) && <Block flex style={{ alignItems: 'flex-end', justifyContent: 'center' }}>
-                  <Text size={18} color={colors.primary} > {data.item.ProductInfo.cost_term_text}</Text>
+                  <HTMLView
+                    value={data.item.ProductInfo.cost_term_text}
+                  />
+                  {/* <Text size={18} color={colors.primary} > {data.item.ProductInfo.cost_term_text}</Text> */}
                 </Block>}
               </Block>
             </TouchableOpacity>
@@ -314,7 +346,7 @@ class HomeScreen extends React.Component {
                 </Block>
                 <Block flex style={{ alignItems: 'flex-end' }}>
                   <Text size={16} color={colors.primary} > {data.item.partner_name}</Text>
-                  <Text size={16} color={colors.primary} > {data.item._card_cost} / Year</Text>
+                  <Text size={16} color={colors.primary} > ${data.item._card_cost} / Year</Text>
                 </Block>
               </Block>
             </TouchableOpacity>
@@ -345,7 +377,7 @@ class HomeScreen extends React.Component {
         <Button
           color={colors.pink}
           textStyle={{ fontSize: 18 }}
-          style={{width: 250}}
+          style={{ width: 250 }}
           onPress={() => this.props.navigation.navigate('CharterPricing')}
         > Activate your Zcard Now</Button>
       </Block>
@@ -388,9 +420,11 @@ function mapDispatchToProps(dispatch) {
     GetUserZCards: (className, funcName, reqArray, successcb, errorcb) => CallClassFunction(className, funcName, reqArray, successcb, errorcb),
     listPartnerProfilesByAccount: (className, funcName, reqArray, successcb, errorcb) => CallClassFunction(className, funcName, reqArray, successcb, errorcb),
     fetchZCardEntry: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
+    fetchProduct: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
     actualTotalZBucks: (className, funcName, reqArray, successcb, errorcb) => CallClassFunction(className, funcName, reqArray, successcb, errorcb),
     getZCardCountExpiringSoon: (className, funcName, reqArray, successcb, errorcb) => CallClassFunction(className, funcName, reqArray, successcb, errorcb),
     setSelectedZCard: (zcard) => SetSelectedZCard(dispatch, zcard),
+    zcard_zmodule_total_monthly: (id, funcName, reqArray, successcb, errorcb) => CallZCardClassFunction(id, funcName, reqArray, successcb, errorcb),
   };
 }
 export default connect(
