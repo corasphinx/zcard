@@ -400,13 +400,14 @@ class CardSettingsScreen extends React.Component {
       state_region: '',
       country: '',
       single_address_field: false,
+      is_single_address_field: false,
       zcard_password: '',
     }
   }
 
   componentDidMount = () => {
     const { selectedZCard } = this.props;
-
+console.info(selectedZCard)
     this.setState({
       tags: {
         tag: '',
@@ -437,6 +438,7 @@ class CardSettingsScreen extends React.Component {
       town_city: selectedZCard.town_city,
       postal_code: selectedZCard.postal_code,
       country: selectedZCard.country,
+      is_single_address_field: selectedZCard.single_address_field != "",
       single_address_field: selectedZCard.single_address_field != "",
       state_region: selectedZCard.state_region != null ? selectedZCard.state_region : 'Please select a state'
     });
@@ -626,6 +628,7 @@ class CardSettingsScreen extends React.Component {
       last_name,
       zc_email,
       zc_phone,
+      is_single_address_field,
       single_address_field,
       street_address,
       town_city,
@@ -886,22 +889,22 @@ class CardSettingsScreen extends React.Component {
                   onChangeText={(zc_phone) => this.setState({ zc_phone })} />
 
                 <ToggleSwitch
-                  isOn={single_address_field}
+                  isOn={is_single_address_field}
                   onColor="green"
                   offColor="red"
                   size='small'
                   label="Use Single or Multiple Address"
                   labelStyle={{ color: colors.primary, fontSize: 18 }}
-                  onToggle={single_address_field => this.setState({ single_address_field })}
+                  onToggle={is_single_address_field => this.setState({ is_single_address_field })}
                 />
-                {single_address_field && <Input
-                  value={zc_phone}
+                {is_single_address_field && <Input
+                  value={single_address_field}
                   style={styles.inputBox} color={colors.primary} fontSize={18}
                   placeholder='Full Address'
                   placeholderTextColor={colors.grey}
                   icon='address' family='Entypo' iconSize={18} iconColor={colors.primary}
-                  onChangeText={(zc_phone) => this.setState({ zc_phone })} />}
-                {!single_address_field && <Block>
+                  onChangeText={(single_address_field) => this.setState({ single_address_field })} />}
+                {!is_single_address_field && <Block>
                   <Text
                     style={[styles.label, { color: colors.grey }]}
                     size={16}>Address</Text>
