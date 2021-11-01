@@ -127,3 +127,20 @@ export function SaveTab(controller, req, successcb, errorcb) {
             if (errorcb) errorcb(error);
         });
 }
+
+export function ClearPassword(controller, successcb, errorcb) {
+    Client.get(controller)
+        .then(res => {
+            if (res.data.success) {
+                if (successcb) {
+                    successcb(res.data.message)
+                }
+            } else {
+                if (errorcb) errorcb(res.data.message);
+            }
+        })
+        .catch(error => {
+            console.error(`ACTION : ${controller} error => `, error);
+            if (errorcb) errorcb(error);
+        });
+}

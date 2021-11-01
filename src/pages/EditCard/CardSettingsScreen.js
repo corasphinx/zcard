@@ -33,6 +33,7 @@ import {
   CallClassFunction,
   CallController,
   SetSelectedZCard,
+  ClearPassword,
 } from '../../redux/actions';
 
 import { hostname } from '../constant';
@@ -400,6 +401,7 @@ class CardSettingsScreen extends React.Component {
       state_region: '',
       country: '',
       single_address_field: false,
+      zcard_password:'',
     }
   }
 
@@ -424,6 +426,7 @@ class CardSettingsScreen extends React.Component {
       zcard_theme_id: selectedZCard.theme_id,
       social_enabled: selectedZCard.social_enabled == 1,
       isPassword: selectedZCard.password !== null,
+      zcard_password: selectedZCard.password,
       seo_indexing: selectedZCard.seo_indexing == 1,
       enable_icon_banner: selectedZCard.enable_icon_banner == 1,
       enable_zcard_promo_banner: selectedZCard.enable_zcard_promo_banner == 1,
@@ -503,24 +506,42 @@ class CardSettingsScreen extends React.Component {
       postal_code,
       country,
       zc_email,
-      zc_phone
+      zc_phone,
+      isPassword,
+      zcard_password
     } = this.state;
 
     this.setState({ saving: true });
+
+    if(isPassword){
+      this.props.setPassword(
+        `/edit-zcard/set_password.php?zcard_id=${selectedZCard.id}`,
+        {password:zcard_password},
+        (msg)=>console.info(msg),
+        (msg)=>console.info(msg)
+      )
+    }else{
+      this.props.clearPassword(
+        `/Zcard/clear_password.php?id=${selectedZCard.id}`,
+        (msg)=>console.info(msg),
+        (msg)=>console.info(msg)
+      )
+    }
+
     this.props.update_card_settings(
       '/Zcard/update_card_settings.php',
       {
         id: selectedZCard.id,
-        toggle_seo_indexing: seo_indexing,
+        toggle_seo_indexing: seo_indexing ? 1 : 0,
         zc_desc: zc_desc,
         zc_name: zc_name,
         zc_card_type: zc_card_type,
         zcard_theme_id: zcard_theme_id,
-        toggle_force_color: force_color,
+        toggle_force_color: force_color ? 1 : 0,
         card_color: card_color,
-        toggle_force_font_color: force_font_color,
+        toggle_force_font_color: force_font_color ? 1 : 0,
         card_font_color: card_font_color,
-        toggle_enable_icon_banner: enable_icon_banner,
+        toggle_enable_icon_banner: enable_icon_banner ? 1 : 0,
         first_name: first_name,
         last_name: last_name,
         single_address_field: single_address_field,
@@ -603,6 +624,7 @@ class CardSettingsScreen extends React.Component {
       town_city,
       postal_code,
       state_region,
+      zcard_password,
     } = this.state;
 
     return (
@@ -714,6 +736,7 @@ class CardSettingsScreen extends React.Component {
                 {isPassword && <Input
                   password
                   viewPass
+                  value={zcard_password}
                   style={styles.inputBox} color={colors.primary} fontSize={18}
                   icon='key' family='AntDesign' iconSize={18} iconColor={colors.primary}
                   onChangeText={(zcard_password) => this.setState({ zcard_password })}
@@ -819,7 +842,6 @@ class CardSettingsScreen extends React.Component {
                     color={colors.blue}
                     icon='user' iconFamily='Entypo' iconSize={18}
                     textStyle={{ fontSize: 18 }}
-                    loading={saving}
                     onPress={this.useAccount}
                   > Use Account Detail</Button>
                 </Block>
@@ -953,6 +975,8 @@ function mapDispatchToProps(dispatch) {
     listPartnerProfilesByAccount: (className, funcName, reqArray, successcb, errorcb) => CallClassFunction(className, funcName, reqArray, successcb, errorcb),
     update_card_settings: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
     setSelectedZCard: (zcard) => SetSelectedZCard(dispatch, zcard),
+    setPassword: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
+    clearPassword: (controller,successcb, errorcb) => ClearPassword(controller, successcb, errorcb),
   };
 }
 export default connect(
