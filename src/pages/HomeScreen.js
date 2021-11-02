@@ -171,7 +171,7 @@ class HomeScreen extends React.Component {
       'getZCardCountExpiringSoon',
       [],
       (expiringCount) => {
-        if (expiringCount > 0)
+        if (expiringCount && expiringCount > 0)
           Toast.show({
             type: 'info',
             position: 'top',

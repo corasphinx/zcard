@@ -33,6 +33,7 @@
     "react-native-divider": "^1.0.3",
     "react-native-document-picker": "^5.2.0",
     "react-native-dots-pagination": "^0.2.0",
+    "react-native-drax": "^0.8.2",
     "react-native-eject": "^0.1.2",
     "react-native-fast-image": "^8.3.6",
     "react-native-file-picker": "0.0.20",

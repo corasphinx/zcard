@@ -81,6 +81,16 @@ const CustomDrawerContent = (props) => {
         )}
         onPress={() => props.navigation.navigate('Newsletter')}
       />}
+      <DrawerItem
+        key={`drawer_item-4`}
+        label={() => (
+          <View style={styles.menuLabelFlex}>
+            <Icon name='sort' family='Font-Awesome' color={colors.primary} size={20} />
+            <Text style={[styles.menuTitle, { color: colors.primary }]}>Edit Section</Text>
+          </View>
+        )}
+        onPress={() => props.navigation.navigate('SectionEdit')}
+      />
       {/* {drawerData.map((item, idx) => (
         <DrawerItem
           key={`drawer_item-${idx + 1}`}
