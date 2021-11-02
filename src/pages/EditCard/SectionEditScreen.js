@@ -21,6 +21,7 @@ import { colors, commonStyles } from '../../styles';
 
 import {
   CallZCardClassFunction,
+  CallController,
 } from '../../redux/actions';
 
 const { width, height } = Dimensions.get('screen');
@@ -29,23 +30,30 @@ class SectionEditScreen extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      loading: false,
-      alphaData: [],
+      loading: true,
+      saving: false,
+      reseting: false,
+      sections: []
     }
   }
 
   componentDidMount = () => {
-    this.setState({ alphaData: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('') });
+    this.fetchSections();
+  }
+
+  fetchSections = () => {
     const { selectedZCard } = this.props;
 
     this.props.getAllSectionEditHTML(
       selectedZCard.id,
       'getAllSectionEditHTML',
       [true],
-      (allSectionEditHTML) => {
-        // console.info(allSectionEditHTML)
+      (sections) => {
+        this.setState({ sections });
+        this.setState({ loading: false, reseting: false });
       },
       (msg) => {
+        this.setState({ loading: false, reseting: false });
         Toast.show({
           type: 'error',
           position: 'top',
@@ -56,70 +64,70 @@ class SectionEditScreen extends React.Component {
     );
   }
 
-  getBackgroundColor = (alphaIndex) => {
-    switch (alphaIndex % 6) {
-      case 0:
-        return '#ffaaaa';
-      case 1:
-        return '#aaffaa';
-      case 2:
-        return '#aaaaff';
-      case 3:
-        return '#ffffaa';
-      case 4:
-        return '#ffaaff';
-      case 5:
-        return '#aaffff';
-      default:
-        return '#aaaaaa';
-    }
-  };
+  reset = () => {
+    this.setState({ reseting: true });
+    this.fetchSections();
+  }
 
-  getHeight = (alphaIndex) => {
-    let height = 50;
-    if (alphaIndex % 2 === 0) {
-      height += 10;
-    }
-    if (alphaIndex % 3 === 0) {
-      height += 20;
-    }
-    return height;
-  };
+  save = () => {
+    const { selectedZCard } = this.props;
+    const { sections } = this.state;
+    this.setState({ saving: true });
+    let sectionsIDs = [];
+    for (let i = 0; i < sections.length; i++)
+      sectionsIDs.push(sections[i].id);
 
-  getItemStyleTweaks = (alphaItem) => {
-    const { alphaData } = this.state;
-    const alphaIndex = alphaData.indexOf(alphaItem);
-    return {
-      backgroundColor: this.getBackgroundColor(alphaIndex),
-      height: this.getHeight(alphaIndex),
-    };
-  };
+    this.props.update_section_order(
+      '/edit-zcard/update_section_order.php',
+      {
+        zcard_id: selectedZCard.id,
+        sections: JSON.stringify(sectionsIDs)
+      },
+      (msg) => {
+        this.setState({ saving: false });
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          text1: 'Success',
+          text2: msg + ' 🎊'
+        });
+      },
+      (msg) => {
+        this.setState({ saving: false });
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Error',
+          text2: msg + ' 😥'
+        });
+      }
+    );
+  }
 
   render = () => {
-    const { alphaData } = this.state;
+    const { sections, saving, reseting } = this.state;
     return (
       <DraxProvider>
         <SafeAreaView
           edges={['top', 'left', 'right']}
           style={styles.container}
         >
-          <DraxList
-            data={alphaData}
+          <AwesomeLoading indicatorId={7} size={80} isActive={this.state.loading} />
+          {sections.length > 0 && <DraxList
+            data={sections}
             renderItemContent={({ item }, { viewState, hover }) => (
               <Block
                 style={[
-                  styles.alphaItem,
-                  this.getItemStyleTweaks(item),
-                  (viewState?.dragStatus === DraxViewDragStatus.Dragging && hover)
-                    ? styles.hover
-                    : undefined,
+                  styles.sectionItem,
+                  { backgroundColor: item.tab_color },
+                  (viewState?.dragStatus === DraxViewDragStatus.Dragging && hover) ? styles.hover : undefined,
                 ]}
               >
-                <Text style={styles.alphaText}>{item}</Text>
+                <Text size={18} color={item.tab_font_color} style={{ flexShrink: 1 }}>{item.name}</Text>
               </Block>
             )}
             onItemDragStart={({ index, item }) => {
-              console.log(`Item #${index} (${item}) drag start`);
+              // console(`Item #${index} (${item}) drag start`);
             }}
             onItemDragPositionChange={({
               index,
@@ -127,7 +135,7 @@ class SectionEditScreen extends React.Component {
               toIndex,
               previousIndex,
             }) => {
-              console.log(`Item #${index} (${item}) dragged to index ${toIndex} (previous: ${previousIndex})`);
+              // console(`Item #${index} (${item}) dragged to index ${toIndex} (previous: ${previousIndex})`);
             }}
             onItemDragEnd={({
               index,
@@ -135,7 +143,7 @@ class SectionEditScreen extends React.Component {
               toIndex,
               toItem,
             }) => {
-              console.log(`Item #${index} (${item}) drag ended at index ${toIndex} (${toItem})`);
+              // console(`Item #${index} (${item}) drag ended at index ${toIndex} (${toItem})`);
             }}
             onItemReorder={({
               fromIndex,
@@ -143,12 +151,12 @@ class SectionEditScreen extends React.Component {
               toIndex,
               toItem,
             }) => {
-              console.log(`Item dragged from index ${fromIndex} (${fromItem}) to index ${toIndex} (${toItem})`);
-              const newData = alphaData.slice();
+              // console(`Item dragged from index ${fromIndex} (${fromItem.id}) to index ${toIndex} (${toItem.id})`);
+              const newData = sections.slice();
               newData.splice(toIndex, 0, newData.splice(fromIndex, 1)[0]);
-              this.setState({ alphaData: newData });
+              this.setState({ sections: newData });
             }}
-            keyExtractor={(item) => item}
+            keyExtractor={(item) => item.id}
             ListHeaderComponent={() => (
               <Block style={styles.header}>
                 <Text style={styles.headerText}>
@@ -159,7 +167,31 @@ class SectionEditScreen extends React.Component {
                 </Text>
               </Block>
             )}
-          />
+            ListFooterComponent={() => (
+              <Block>
+                <Block style={commonStyles.divider} />
+                <Block row center>
+                  <Button
+                    color={colors.green}
+                    icon='save' iconFamily='AntDesign' iconSize={18}
+                    textStyle={{ fontSize: 18 }}
+                    loading={saving}
+                    size='small'
+                    onPress={() => this.save()}
+                  > Save</Button>
+                  <Button
+                    color={colors.gray}
+                    icon='reload1' iconFamily='AntDesign' iconSize={18}
+                    textStyle={{ fontSize: 18 }}
+                    size='small'
+                    loading={reseting}
+                    onPress={() => this.reset()}
+                  > Reset</Button>
+                </Block>
+              </Block>
+            )}
+          />}
+          <Toast ref={(ref) => Toast.setRef(ref)} />
         </SafeAreaView>
       </DraxProvider>
     );
@@ -175,6 +207,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     getAllSectionEditHTML: (id, funcName, reqArray, successcb, errorcb) => CallZCardClassFunction(id, funcName, reqArray, successcb, errorcb),
+    update_section_order: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
   };
 }
 export default connect(
@@ -194,20 +227,20 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 16,
     fontStyle: 'italic',
+    color: colors.primary
   },
-  alphaItem: {
-    backgroundColor: '#aaaaff',
+  sectionItem: {
     borderRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.border,
     margin: 4,
-    padding: 4,
+    padding: 8,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  alphaText: {
-    fontSize: 28,
-  },
   hover: {
-    borderColor: 'blue',
+    borderColor: 'purple',
     borderWidth: 2,
+    transform: [{ rotate: '-5deg' }]
   },
 });
