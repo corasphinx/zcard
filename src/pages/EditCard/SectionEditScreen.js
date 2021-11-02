@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   hover: {
-    borderColor: 'purple',
+    borderColor: colors.blue,
     borderWidth: 2,
     transform: [{ rotate: '-5deg' }]
   },
