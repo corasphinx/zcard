@@ -6,6 +6,7 @@ import CardSettingsScreen from '../pages/EditCard/CardSettingsScreen';
 import CustomURLSScreen from '../pages/EditCard/CustomURLSScreen';
 import MainImagesScreen from '../pages/EditCard/MainImagesScreen';
 import PickerScreen from '../pages/EditCard/PickerScreen';
+import NewsletterScreen from '../pages/EditCard/NewsletterScreen';
 import { colors, fonts } from '../styles';
 
 const headerLeftComponent = (props) => {
@@ -85,6 +86,18 @@ const StackNavigationData = [
     title: 'Pick Color',
     component: PickerScreen,
     headerLeft: headerLeftComponent,
+    headerBackground: { source: headerBackground },
+    headerTitleStyle: {
+      fontFamily: fonts.primaryRegular,
+      color: colors.white,
+      fontSize: 18,
+    },
+  },
+  {
+    name: 'Newsletter',
+    title: 'Push Notifications',
+    component: NewsletterScreen,
+    headerLeft: null,
     headerBackground: { source: headerBackground },
     headerTitleStyle: {
       fontFamily: fonts.primaryRegular,

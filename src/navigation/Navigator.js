@@ -71,6 +71,16 @@ const CustomDrawerContent = (props) => {
         )}
         onPress={() => props.navigation.navigate('MainImages')}
       />
+      {zcard != null && zcard.product_type == 3 && zcard.enable_notifications != 0 && <DrawerItem
+        key={`drawer_item-4`}
+        label={() => (
+          <View style={styles.menuLabelFlex}>
+            <Icon name='notification' family='AntDesign' color={colors.primary} size={20} />
+            <Text style={[styles.menuTitle, { color: colors.primary }]}>{zcard.newsletter_section_text == null ? 'Push notifications' : zcard.newsletter_section_text}</Text>
+          </View>
+        )}
+        onPress={() => props.navigation.navigate('Newsletter')}
+      />}
       {/* {drawerData.map((item, idx) => (
         <DrawerItem
           key={`drawer_item-${idx + 1}`}
