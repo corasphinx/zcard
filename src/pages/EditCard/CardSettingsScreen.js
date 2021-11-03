@@ -514,14 +514,14 @@ class CardSettingsScreen extends React.Component {
       this.props.setPassword(
         `/edit-zcard/set_password.php?zcard_id=${selectedZCard.id}`,
         { password: zcard_password },
-        (msg) => console.info(msg),
-        (msg) => console.info(msg)
+        (msg) => {},
+        (msg) => {}
       )
     } else {
       this.props.clearPassword(
         `/Zcard/clear_password.php?id=${selectedZCard.id}`,
-        (msg) => console.info(msg),
-        (msg) => console.info(msg)
+        (msg) => {},
+        (msg) => {}
       )
     }
 
@@ -531,8 +531,8 @@ class CardSettingsScreen extends React.Component {
       {
         tags: tags.tagsArray
       },
-      (msg) => console.info(msg),
-      (msg) => console.info(msg),
+      (msg) => {},
+      (msg) => {},
     );
 
     // save data

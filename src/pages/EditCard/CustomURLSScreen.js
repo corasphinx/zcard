@@ -106,7 +106,6 @@ class CustomURLSScreen extends React.Component {
         icon_label: element[2]
       });
     };
-    console.info(icons)
     this.props.update_icons(
       `edit-zcard/update_icons.php?zcard_id=${selectedZCard.id}`,
       {
