@@ -18,12 +18,13 @@ import {
 } from 'galio-framework';
 import AwesomeLoading from 'react-native-awesome-loading';
 import Toast from 'react-native-toast-message';
-import FacebookTabBar from './FacebookTabBar';
+import ScrollTabBar from './ScrollTabBar';
+import HTMLView from 'react-native-htmlview';
 import { Dropdown } from 'react-native-material-dropdown';
 import { colors, commonStyles } from '../../styles';
 
 import {
-  CallZCardClassFunction,
+  GetAllSectionEditHTML,
   CallController,
 } from '../../redux/actions';
 import ScrollableTabView, { ScrollableTabBar } from 'react-native-scrollable-tab-view';
@@ -82,8 +83,6 @@ class CreateSectionScreen extends React.Component {
   }
 
   componentDidMount = () => {
-    const { selectedZCard } = this.props;
-
     this.setState({
       text_originTabColor: colors.original_tab_color,
       text_originTabFontColor: colors.original_tab_font_color,
@@ -101,22 +100,257 @@ class CreateSectionScreen extends React.Component {
   }
 
   saveTextSection = () => {
+    const { selectedZCard } = this.props;
+    const {
+      text_sectionTitle,
+      text_sectionDescription,
+      text_originTabColor,
+      text_originTabFontColor
+    } = this.state;
     this.setState({ creatingTextSection: true });
+    this.props.updateSection(
+      `/edit-zcard/update_any_section.php?z=${selectedZCard.id}&s=0&t=text`,
+      {
+        section_name: text_sectionTitle,
+        section_html: text_sectionDescription,
+        tab_color: text_originTabColor,
+        tab_font_color: text_originTabFontColor
+      },
+      (msg) => {
+        this.setState({ creatingTextSection: false });
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          text1: 'Success',
+          text2: 'Saved successfully 🎊'
+        });
+        this.fetchSections();
+      },
+      (msg) => {
+        this.setState({ creatingTextSection: false });
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Error',
+          text2: 'Failed to save 😥'
+        });
+      }
+    );
   }
   saveVideoSection = () => {
     this.setState({ creatingVideoSection: true });
+    const { selectedZCard } = this.props;
+    const {
+      video_sectionTitle,
+      video_url,
+      video_sectionDescription,
+      video_originTabColor,
+      video_originTabFontColor
+    } = this.state;
+    this.props.updateSection(
+      `/edit-zcard/update_any_section.php?z=${selectedZCard.id}&s=0&t=video`,
+      {
+        section_name: video_sectionTitle,
+        video_url: video_url,
+        section_html: video_sectionDescription,
+        tab_color: video_originTabColor,
+        tab_font_color: video_originTabFontColor
+      },
+      (msg) => {
+        this.setState({ creatingVideoSection: false });
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          text1: 'Success',
+          text2: 'Saved successfully 🎊'
+        });
+        this.fetchSections();
+      },
+      (msg) => {
+        this.setState({ creatingVideoSection: false });
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Error',
+          text2: 'Failed to save 😥'
+        });
+      }
+    );
   }
   saveImageSection = () => {
     this.setState({ creatingImageSection: true });
+    const { selectedZCard } = this.props;
+    const {
+      image_sectionTitle,
+      image_url,
+      image_sectionDescription,
+      image_originTabColor,
+      image_originTabFontColor
+    } = this.state;
+    this.props.updateSection(
+      `/edit-zcard/update_any_section.php?z=${selectedZCard.id}&s=0&t=image`,
+      {
+        image_name: image_sectionTitle,
+        image_url: image_url,
+        section_html: image_sectionDescription,
+        tab_color: image_originTabColor,
+        tab_font_color: image_originTabFontColor
+      },
+      (msg) => {
+        this.setState({ creatingImageSection: false });
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          text1: 'Success',
+          text2: 'Saved successfully 🎊'
+        });
+        this.fetchSections();
+      },
+      (msg) => {
+        this.setState({ creatingImageSection: false });
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Error',
+          text2: 'Failed to save 😥'
+        });
+      }
+    );
   }
   savePDFSection = () => {
     this.setState({ creatingPDFSection: true });
+    const { selectedZCard } = this.props;
+    const {
+      pdf_sectionTitle,
+      pdf_url,
+      pdf_originTabColor,
+      pdf_originTabFontColor
+    } = this.state;
+    this.props.updateSection(
+      `/edit-zcard/update_any_section.php?z=${selectedZCard.id}&s=0&t=pdf`,
+      {
+        section_name: pdf_sectionTitle,
+        pdf_url: pdf_url,
+        tab_color: pdf_originTabColor,
+        tab_font_color: pdf_originTabFontColor
+      },
+      (msg) => {
+        this.setState({ creatingPDFSection: false });
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          text1: 'Success',
+          text2: 'Saved successfully 🎊'
+        });
+        this.fetchSections();
+      },
+      (msg) => {
+        this.setState({ creatingPDFSection: false });
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Error',
+          text2: 'Failed to save 😥'
+        });
+      }
+    );
   }
   saveHTMLSection = () => {
     this.setState({ creatingHTMLSection: true });
+    const { selectedZCard } = this.props;
+    const {
+      html_sectionTitle,
+      html_sectionDescription,
+      html_originTabColor,
+      html_originTabFontColor
+    } = this.state;
+    this.props.updateSection(
+      `/edit-zcard/update_any_section.php?z=${selectedZCard.id}&s=0&t=default`,
+      {
+        section_name: html_sectionTitle,
+        section_html: html_sectionDescription,
+        tab_color: html_originTabColor,
+        tab_font_color: html_originTabFontColor
+      },
+      (msg) => {
+        this.setState({ creatingHTMLSection: false });
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          text1: 'Success',
+          text2: 'Saved successfully 🎊'
+        });
+        this.fetchSections();
+      },
+      (msg) => {
+        this.setState({ creatingHTMLSection: false });
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Error',
+          text2: 'Failed to save 😥'
+        });
+      }
+    );
   }
   saveFacebookSection = () => {
     this.setState({ creatingFacebookSection: true });
+    const { selectedZCard } = this.props;
+    const {
+      facebook_sectionTitle,
+      facebook_url,
+      facebook_originTabColor,
+      facebook_originTabFontColor
+    } = this.state;
+    this.props.updateSection(
+      `/edit-zcard/update_any_section.php?z=${selectedZCard.id}&s=0&t=facebook_embed`,
+      {
+        section_name: facebook_sectionTitle,
+        general_value: facebook_url,
+        tab_color: facebook_originTabColor,
+        tab_font_color: facebook_originTabFontColor
+      },
+      (msg) => {
+        this.setState({ creatingFacebookSection: false });
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          text1: 'Success',
+          text2: 'Saved successfully 🎊'
+        });
+        this.fetchSections();
+      },
+      (msg) => {
+        this.setState({ creatingFacebookSection: false });
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Error',
+          text2: 'Failed to save 😥'
+        });
+      }
+    );
+  }
+
+  fetchSections = () => {
+    const { selectedZCard } = this.props;
+
+    this.props.getAllSectionEditHTML(
+      selectedZCard.id,
+      'getAllSectionEditHTML',
+      [true],
+      () => {
+        this.props.navigation.goBack();
+      },
+      (msg) => {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Error',
+          text2: msg + ' 😥'
+        });
+      }
+    );
   }
 
   renderTextSection = () => {
@@ -173,7 +407,6 @@ class CreateSectionScreen extends React.Component {
       </Block>
     </ScrollView>
   }
-
   renderVideoSection = () => {
     const { creatingVideoSection, video_sectionTitle, video_originTabColor, video_originTabFontColor } = this.state;
     return <ScrollView tabLabel='Video' style={styles.tabView}>
@@ -350,7 +583,7 @@ class CreateSectionScreen extends React.Component {
     </ScrollView>
   }
   renderHTMLSection = () => {
-    const { creatingHTMLSection, html_sectionTitle, html_originTabColor, html_originTabFontColor, isPreviewHTML } = this.state;
+    const { creatingHTMLSection, html_sectionTitle, html_sectionDescription, html_originTabColor, html_originTabFontColor, isPreviewHTML } = this.state;
     return <ScrollView tabLabel='HTML' style={styles.tabView}>
       <Text
         style={[styles.label, { color: colors.grey }]}
@@ -361,13 +594,18 @@ class CreateSectionScreen extends React.Component {
         icon='profile' family='AntDesign' iconSize={18} iconColor={colors.primary}
         onChangeText={(html_sectionTitle) => this.setState({ html_sectionTitle })}
       />
-      <TextInput
+      {!isPreviewHTML && <TextInput
         multiline
         numberOfLines={3}
         placeholder='Input your data for this section in the editor. Use the code editor </> to utilize writing raw html code. Leave the editor </> before saving this section'
         onChangeText={(html_sectionDescription) => this.setState({ html_sectionDescription })}
         style={styles.description}>
-      </TextInput>
+      </TextInput>}
+      {isPreviewHTML && <HTMLView
+        style={{ padding: 10, borderWidth: 1, borderRadius: 8, borderColor: colors.border, backgroundColor: colors.backgroundLight }}
+        value={html_sectionDescription == undefined ? '' : html_sectionDescription}
+        stylesheet={tagStyles}
+      />}
       <Block style={{ alignItems: 'flex-end' }}>
         <Button
           color={colors.blue}
@@ -475,7 +713,7 @@ class CreateSectionScreen extends React.Component {
           <ScrollableTabView
             style={{ marginTop: 20 }}
             initialPage={0}
-            renderTabBar={() => <FacebookTabBar />}
+            renderTabBar={() => <ScrollTabBar />}
           >
             {this.renderTextSection()}
             {this.renderVideoSection()}
@@ -499,14 +737,23 @@ function mapStateToProps(state) {
 }
 function mapDispatchToProps(dispatch) {
   return {
-    fetchNewSectionHTML: (id, funcName, reqArray, successcb, errorcb) => CallZCardClassFunction(id, funcName, reqArray, successcb, errorcb),
-    save_use_template_id: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
+    getAllSectionEditHTML: (id, funcName, reqArray, successcb, errorcb) => GetAllSectionEditHTML(dispatch, id, funcName, reqArray, successcb, errorcb),
+    updateSection: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
   };
 }
 export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(CreateSectionScreen);
+
+const tagStyles = StyleSheet.create({
+  p: {
+    fontSize: 16,
+  },
+  li: {
+    fontSize: 16,
+  },
+})
 
 const styles = StyleSheet.create({
   container: {

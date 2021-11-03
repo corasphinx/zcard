@@ -8,7 +8,7 @@ import {Text, Icon} from 'galio-framework';
 // import Icon from 'react-native-vector-icons/Ionicons';
 import { colors } from '../../styles';
 
-class FacebookTabBar extends React.Component {
+class ScrollTabBar extends React.Component {
   icons = [];
 
   constructor(props) {
@@ -95,4 +95,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default FacebookTabBar;
+export default ScrollTabBar;

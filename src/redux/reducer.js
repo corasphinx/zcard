@@ -1,12 +1,14 @@
 import {
   SET_CURRENT_USER,
   SET_SELECTED_ZCARD,
+  SET_CURRENT_SECTIONS,
 } from './types';
 
 // set default Redux state
 const initialState = {
   currentUser: {},
   selectedZCard:null,
+  currentSections:[],
 };
 
 // reducer with cases for Redux
@@ -19,6 +21,10 @@ function reducer(state = initialState, action) {
     case SET_SELECTED_ZCARD:
       return {
         ...state, selectedZCard: action.zcard
+      };
+    case SET_CURRENT_SECTIONS:
+      return {
+        ...state, currentSections: action.sections
       };
   }
 }

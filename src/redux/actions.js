@@ -2,6 +2,7 @@ import { Client } from './api';
 import {
     SET_CURRENT_USER,
     SET_SELECTED_ZCARD,
+    SET_CURRENT_SECTIONS,
 } from './types';
 
 function convertParams(req) {
@@ -24,6 +25,13 @@ export function SetSelectedZCard(dispatch, zcard) {
         type: SET_SELECTED_ZCARD,
         zcard: zcard
     })
+}
+
+export function SetCurrentSections(dispatch, sections) {
+    dispatch({
+        type: SET_CURRENT_SECTIONS,
+        sections: sections
+    });
 }
 
 export function CallController(controller, req, successcb, errorcb, getData = false) {
@@ -141,6 +149,26 @@ export function ClearPassword(controller, successcb, errorcb) {
         })
         .catch(error => {
             console.error(`ACTION : ${controller} error => `, error);
+            if (errorcb) errorcb(error);
+        });
+}
+export function GetAllSectionEditHTML(dispatch, id, funcName, reqArray, successcb, errorcb) {
+    Client.post(`/App/call_zcard_class_function.php`,
+        convertParams({
+            id: id,
+            func: funcName,
+            params: JSON.stringify(reqArray)
+        }))
+        .then(res => {
+            if (res.data.success) {
+                SetCurrentSections(dispatch, res.data.data);
+                if (successcb) successcb(res.data.data);
+            } else {
+                if (errorcb) errorcb(res.data.message);
+            }
+        })
+        .catch(error => {
+            console.error(`ACTION : ${funcName} error => `, error);
             if (errorcb) errorcb(error);
         });
 }

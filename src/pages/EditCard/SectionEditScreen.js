@@ -20,8 +20,9 @@ import { DraxProvider, DraxList, DraxViewDragStatus } from 'react-native-drax';
 import { colors, commonStyles } from '../../styles';
 
 import {
-  CallZCardClassFunction,
+  GetAllSectionEditHTML,
   CallController,
+  SetCurrentSections,
 } from '../../redux/actions';
 
 const { width, height } = Dimensions.get('screen');
@@ -33,7 +34,6 @@ class SectionEditScreen extends React.Component {
       loading: true,
       saving: false,
       reseting: false,
-      sections: []
     }
   }
 
@@ -48,8 +48,7 @@ class SectionEditScreen extends React.Component {
       selectedZCard.id,
       'getAllSectionEditHTML',
       [true],
-      (sections) => {
-        this.setState({ sections });
+      () => {
         this.setState({ loading: false, reseting: false });
       },
       (msg) => {
@@ -70,12 +69,12 @@ class SectionEditScreen extends React.Component {
   }
 
   save = () => {
-    const { selectedZCard } = this.props;
-    const { sections } = this.state;
+    const { selectedZCard, currentSections } = this.props;
+
     this.setState({ saving: true });
     let sectionsIDs = [];
-    for (let i = 0; i < sections.length; i++)
-      sectionsIDs.push(sections[i].id);
+    for (let i = 0; i < currentSections.length; i++)
+      sectionsIDs.push(currentSections[i].id);
 
     this.props.update_section_order(
       '/edit-zcard/update_section_order.php',
@@ -105,7 +104,8 @@ class SectionEditScreen extends React.Component {
   }
 
   render = () => {
-    const { sections, saving, reseting } = this.state;
+    const {currentSections} = this.props;
+    const { saving, reseting } = this.state;
     return (
       <DraxProvider>
         <SafeAreaView
@@ -113,8 +113,8 @@ class SectionEditScreen extends React.Component {
           style={styles.container}
         >
           <AwesomeLoading indicatorId={7} size={80} isActive={this.state.loading} />
-          {sections.length > 0 && <DraxList
-            data={sections}
+          {currentSections && <DraxList
+            data={currentSections}
             renderItemContent={({ item }, { viewState, hover }) => (
               <Block
                 style={[
@@ -152,9 +152,9 @@ class SectionEditScreen extends React.Component {
               toItem,
             }) => {
               // console(`Item dragged from index ${fromIndex} (${fromItem.id}) to index ${toIndex} (${toItem.id})`);
-              const newData = sections.slice();
+              const newData = currentSections.slice();
               newData.splice(toIndex, 0, newData.splice(fromIndex, 1)[0]);
-              this.setState({ sections: newData });
+              this.props.setCurrentSections(newData);
             }}
             keyExtractor={(item) => item.id}
             ListHeaderComponent={() => (
@@ -167,40 +167,37 @@ class SectionEditScreen extends React.Component {
                 </Text>
               </Block>
             )}
-            ListFooterComponent={() => (
-              <Block>
-                <Block style={commonStyles.divider} />
-                <Block row center>
-                  <Button
-                    color={colors.green}
-                    icon='save' iconFamily='AntDesign' iconSize={18}
-                    textStyle={{ fontSize: 18 }}
-                    loading={saving}
-                    size='small'
-                    onPress={() => this.save()}
-                  > Save Order</Button>
-                  <Button
-                    color={colors.gray}
-                    icon='reload1' iconFamily='AntDesign' iconSize={18}
-                    textStyle={{ fontSize: 18 }}
-                    size='small'
-                    loading={reseting}
-                    onPress={() => this.reset()}
-                  > Reset Order</Button>
-                  <Button
-                    color={colors.purple}
-                    icon='plussquareo' iconFamily='AntDesign' iconSize={18}
-                    textStyle={{ fontSize: 18 }}
-                    size='small'
-                    loading={reseting}
-                    onPress={() => this.props.navigation.navigate('CreateSection')}
-                  > Add Section</Button>
-                </Block>
-              </Block>
-            )}
           />}
           <Toast ref={(ref) => Toast.setRef(ref)} />
         </SafeAreaView>
+        <Block style={{backgroundColor:colors.backgroundLight}}>
+          <Block style={commonStyles.divider} />
+          <Block row center>
+            <Button
+              color={colors.green}
+              icon='save' iconFamily='AntDesign' iconSize={18}
+              textStyle={{ fontSize: 18 }}
+              loading={saving}
+              size='small'
+              onPress={() => this.save()}
+            > Save Order</Button>
+            <Button
+              color={colors.gray}
+              icon='reload1' iconFamily='AntDesign' iconSize={18}
+              textStyle={{ fontSize: 18 }}
+              size='small'
+              loading={reseting}
+              onPress={() => this.reset()}
+            > Reset Order</Button>
+            <Button
+              color={colors.purple}
+              icon='plussquareo' iconFamily='AntDesign' iconSize={18}
+              textStyle={{ fontSize: 18 }}
+              size='small'
+              onPress={() => this.props.navigation.navigate('CreateSection')}
+            > Add Section</Button>
+          </Block>
+        </Block>
       </DraxProvider>
     );
   }
@@ -210,12 +207,14 @@ function mapStateToProps(state) {
   return {
     currentUser: state.currentUser,
     selectedZCard: state.selectedZCard,
+    currentSections:state.currentSections
   };
 }
 function mapDispatchToProps(dispatch) {
   return {
-    getAllSectionEditHTML: (id, funcName, reqArray, successcb, errorcb) => CallZCardClassFunction(id, funcName, reqArray, successcb, errorcb),
+    getAllSectionEditHTML: (id, funcName, reqArray, successcb, errorcb) => GetAllSectionEditHTML(dispatch, id, funcName, reqArray, successcb, errorcb),
     update_section_order: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
+    setCurrentSections:(sections)=>SetCurrentSections(dispatch, sections)
   };
 }
 export default connect(
