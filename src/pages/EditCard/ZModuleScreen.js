@@ -26,7 +26,7 @@ import {
 
 const { width, height } = Dimensions.get('screen');
 
-class TemplateSettingsScreen extends React.Component {
+class ZModule extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -115,17 +115,13 @@ class TemplateSettingsScreen extends React.Component {
 
   deleteCard = () => {
     const { selectedZCard } = this.props;
-
     this.setState({ deleting: true, isDeleteModal: false });
     this.props.deleteCard(
       '/Zcard/delete-zcard.php',
       {
         zcard_id: selectedZCard.id
       },
-      () => {
-        gRefresh = true;
-        this.props.navigation.goBack();
-      },
+      () => this.props.navigation.goBack(),
       (msg) => {
         this.setState({ deleting: false });
         Toast.show({
@@ -216,13 +212,12 @@ function mapDispatchToProps(dispatch) {
   return {
     fetchZCardTemplates: (id, funcName, reqArray, successcb, errorcb) => CallZCardClassFunction(id, funcName, reqArray, successcb, errorcb),
     save_use_template_id: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
-    deleteCard: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
   };
 }
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(TemplateSettingsScreen);
+)(ZModule);
 
 const styles = StyleSheet.create({
   container: {

@@ -23,6 +23,7 @@ import {
   GetAllSectionEditHTML,
   CallController,
   SetCurrentSections,
+  FetchAddSectionPermission,
 } from '../../redux/actions';
 
 const { width, height } = Dimensions.get('screen');
@@ -34,11 +35,28 @@ class SectionEditScreen extends React.Component {
       loading: true,
       saving: false,
       reseting: false,
+      canAdd:false,
     }
   }
 
   componentDidMount = () => {
+    const { selectedZCard } = this.props;
     this.fetchSections();
+
+    this.props.fetchAddSectionPermission(
+      selectedZCard.id,
+      'addSectionPermission',
+      [],
+      (canAdd) => {this.setState({canAdd})},
+      (msg) => {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Error',
+          text2: msg + ' 😥'
+        });
+      },
+    )
   }
 
   fetchSections = () => {
@@ -105,7 +123,7 @@ class SectionEditScreen extends React.Component {
 
   render = () => {
     const {currentSections} = this.props;
-    const { saving, reseting } = this.state;
+    const { saving, reseting, canAdd } = this.state;
     return (
       <DraxProvider>
         <SafeAreaView
@@ -189,13 +207,13 @@ class SectionEditScreen extends React.Component {
               loading={reseting}
               onPress={() => this.reset()}
             > Reset Order</Button>
-            <Button
+            {canAdd && <Button
               color={colors.purple}
               icon='plussquareo' iconFamily='AntDesign' iconSize={18}
               textStyle={{ fontSize: 18 }}
               size='small'
               onPress={() => this.props.navigation.navigate('CreateSection')}
-            > Add Section</Button>
+            > Add Section</Button>}
           </Block>
         </Block>
       </DraxProvider>
@@ -214,7 +232,8 @@ function mapDispatchToProps(dispatch) {
   return {
     getAllSectionEditHTML: (id, funcName, reqArray, successcb, errorcb) => GetAllSectionEditHTML(dispatch, id, funcName, reqArray, successcb, errorcb),
     update_section_order: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
-    setCurrentSections:(sections)=>SetCurrentSections(dispatch, sections)
+    setCurrentSections:(sections)=>SetCurrentSections(dispatch, sections),
+    fetchAddSectionPermission: (id, funcName, reqArray, successcb, errorcb) => FetchAddSectionPermission(dispatch, id, funcName, reqArray, successcb, errorcb),
   };
 }
 export default connect(

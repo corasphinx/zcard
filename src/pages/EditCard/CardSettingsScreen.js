@@ -586,6 +586,7 @@ class CardSettingsScreen extends React.Component {
         updatedZCard.phone = zc_phone;
         this.props.setSelectedZCard(updatedZCard);
         this.setState({ saving: false });
+        gRefresh = true;
         Toast.show({
           type: 'success',
           position: 'top',

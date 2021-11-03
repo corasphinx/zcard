@@ -172,3 +172,22 @@ export function GetAllSectionEditHTML(dispatch, id, funcName, reqArray, successc
             if (errorcb) errorcb(error);
         });
 }
+export function FetchAddSectionPermission(dispatch, id, funcName, reqArray, successcb, errorcb) {
+    Client.post(`/App/call_zcard_class_function.php`,
+        convertParams({
+            id: id,
+            func: funcName,
+            params: JSON.stringify(reqArray)
+        }))
+        .then(res => {
+            if (res.data.success) {
+                if (successcb) successcb(res.data.data);
+            } else {
+                if (errorcb) errorcb(res.data.message);
+            }
+        })
+        .catch(error => {
+            console.error(`ACTION : ${funcName} error => `, error);
+            if (errorcb) errorcb(error);
+        });
+}

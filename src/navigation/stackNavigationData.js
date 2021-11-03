@@ -9,6 +9,7 @@ import PickerScreen from '../pages/EditCard/PickerScreen';
 import NewsletterScreen from '../pages/EditCard/NewsletterScreen';
 import SectionEditScreen from '../pages/EditCard/SectionEditScreen';
 import CreateSectionScreen from '../pages/EditCard/CreateSectionScreen';
+import ZModuleScreen from '../pages/EditCard/ZModuleScreen';
 import { colors, fonts } from '../styles';
 
 const headerLeftComponent = (props) => {
@@ -123,6 +124,18 @@ const StackNavigationData = [
     name: 'CreateSection',
     title: 'Create Section',
     component: CreateSectionScreen,
+    headerLeft: headerLeftComponent,
+    headerBackground: { source: headerBackground },
+    headerTitleStyle: {
+      fontFamily: fonts.primaryRegular,
+      color: colors.white,
+      fontSize: 18,
+    },
+  },
+  {
+    name: 'ZModule',
+    title: 'Add ZModule',
+    component: ZModuleScreen,
     headerLeft: headerLeftComponent,
     headerBackground: { source: headerBackground },
     headerTitleStyle: {
