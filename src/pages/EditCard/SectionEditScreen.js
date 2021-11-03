@@ -178,7 +178,7 @@ class SectionEditScreen extends React.Component {
                     loading={saving}
                     size='small'
                     onPress={() => this.save()}
-                  > Save</Button>
+                  > Save Order</Button>
                   <Button
                     color={colors.gray}
                     icon='reload1' iconFamily='AntDesign' iconSize={18}
@@ -186,7 +186,15 @@ class SectionEditScreen extends React.Component {
                     size='small'
                     loading={reseting}
                     onPress={() => this.reset()}
-                  > Reset</Button>
+                  > Reset Order</Button>
+                  <Button
+                    color={colors.purple}
+                    icon='plussquareo' iconFamily='AntDesign' iconSize={18}
+                    textStyle={{ fontSize: 18 }}
+                    size='small'
+                    loading={reseting}
+                    onPress={() => this.props.navigation.navigate('CreateSection')}
+                  > Add Section</Button>
                 </Block>
               </Block>
             )}

@@ -36,7 +36,7 @@ export default StyleSheet.create({
   topBar: {
     alignItems: 'center',
     borderBottomColor: 'grey',
-    paddingHorizontal: theme.SIZES.BASE * 0.5,
+    paddingHorizontal: 10,
   },
   collapseTitle:{
     borderTopLeftRadius: 8,
@@ -77,5 +77,17 @@ export default StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     margin: 10
-  }
+  },
+  Card: {
+    borderWidth: 1,
+    borderRadius:8,
+    backgroundColor: colors.backgroundLight,
+    borderColor: colors.border,
+    padding: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 3, },
+    shadowOpacity: 0.5,
+    shadowRadius: 3,
+    elevation: 5,
+  },
 });

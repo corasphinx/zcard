@@ -15,8 +15,10 @@ const blueVersion = {
   purple: '#7a44cf',
   background: '#EEEEEE',
   backgroundLight: '#FFFFFF',
-  border: '#acacac',
+  border: 'rgba(0,0,0,0.1)',//'#acacac',
   header: '#5a8dee',
+  original_tab_color:'#8395a7',
+  original_tab_font_color:'#000000',
 };
 
 export default blueVersion;

@@ -28,7 +28,7 @@ const Drawer = createDrawerNavigator();
 
 const CustomDrawerContent = (props) => {
   const { zcard } = props;
-  
+
   return (
     <DrawerContentScrollView {...props} style={{ padding: 0 }}>
       <DrawerItem
@@ -85,7 +85,7 @@ const CustomDrawerContent = (props) => {
         key={`drawer_item-4`}
         label={() => (
           <View style={styles.menuLabelFlex}>
-            <Icon name='sort' family='Font-Awesome' color={colors.primary} size={20} />
+            <Icon name='edit' family='Font-Awesome' color={colors.primary} size={20} />
             <Text style={[styles.menuTitle, { color: colors.primary }]}>Edit Section</Text>
           </View>
         )}
