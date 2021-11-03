@@ -59,7 +59,7 @@ class HomeScreen extends React.Component {
   gRefresh = false;
   componentDidMount = () => {
     this.focusListener = this.props.navigation.addListener('focus', () => {
-      if(gRefresh) this.initData();
+      if (gRefresh) this.initData();
     })
     this.initData();
     gRefresh = false;
@@ -81,7 +81,7 @@ class HomeScreen extends React.Component {
       'GetUserZCards',
       [currentUser.id],
       (zcardIds) => {
-        if (zcardIds)
+        if (zcardIds && zcardIds.length)
           zcardIds.map(zcard_id => {
             this.props.fetchZCardEntry(
               '/Chatter/App/fetchZCard.php',
@@ -138,6 +138,8 @@ class HomeScreen extends React.Component {
               true
             );
           });
+        else
+          this.setState({ loading: false });
       },
       (msg) => {
         this.setState({ loading: false });
