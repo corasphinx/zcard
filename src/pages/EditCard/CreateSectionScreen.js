@@ -30,14 +30,7 @@ import {
 import ScrollableTabView, { ScrollableTabBar } from 'react-native-scrollable-tab-view';
 
 const { width, height } = Dimensions.get('screen');
-const sectionTypes = [
-  { value: 'text_section', label: 'Text' },
-  { value: 'custom_video', label: 'Video' },
-  { value: 'custom_image', label: 'Image' },
-  { value: 'pdf_section', label: 'PDF Viewer' },
-  { value: 'default_section', label: 'Custom HTML' },
-  { value: 'facebook_embed', label: 'Facebook Embed' },
-];
+
 class CreateSectionScreen extends React.Component {
   constructor(props) {
     super(props)

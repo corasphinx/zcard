@@ -27,6 +27,7 @@ import HTMLView from 'react-native-htmlview';
 import { Collapse, CollapseHeader, CollapseBody } from 'accordion-collapse-react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import { colors, commonStyles } from '../styles';
+import DeleteModal from '../components/DeleteModal';
 
 import {
   SignOut,
@@ -49,18 +50,27 @@ class HomeScreen extends React.Component {
       user_partner_profiles: [],
       totalZBucks: 0,
       isExpandedMyCards: false,
-      isExpandedEnterpriseCards: false
+      isExpandedEnterpriseCards: false,
+      isDeleteModal: false,
+      selected_zcard_id: 0,
     }
   }
 
   componentDidMount = () => {
     this.initData();
+    Toast.show({
+      type: 'info',
+      position: 'top',
+      text1: 'Information',
+      text2: 'You have cards that are expiring soon below. Simply click "Renew" on the card you need to renew to either renew your existing card, or upgrade to a different card product 😊'
+    });
     // this.setState({ zcards: [{ "ProductInfo": { "account_max": 1, "analytics_enabled": 0, "buy_text": "Add to Cart", "card_processing_folder": null, "category_id": 1, "cost_per_term": "0.0000", "cost_term_text": "FREE", "db": [Object], "dbhost": "localhost", "dbname": "zortt_socialinno", "dbpw": "hDy4.&@Q&A)~11993381083", "dbuser": "zortt_admininno", "dev_http_host": "dev.zortt.com", "error": "No results were found for this search.", "generate_commission": 1, "id": 1, "is_active": 1, "is_zcard_module": 0, "live_http_host": "zortt.com", "max_sections_allowed": 0, "module_label": null, "new_zmodule": 0, "photo_src": "/images/general_images/1571944786-ff582556033c82c8710d2d11ad924aaa-336.png", "product_desc": "A FREE Zcard  <p></p><li><b>Custom Images</b></li><li><b>Customized Icon Bar</b></li><li><b>Mobile and desktop version included</b></li><li><b>No custom tabs</b></li><p></p>", "product_name": "Zcard", "product_type": 0, "task_info": false, "term_duration": 0, "valid": true, "version": "1.1.8", "zbucks_amount": 0, "ztext_amount": null }, "acc_id": 18, "allow_partner_master": 0, "assigned_partner_company": null, "card_color": "#8395a7", "card_font_color": "#000", "card_type": null, "country": null, "creation_date": "2021-05-26", "db": { "affected_rows": null, "client_info": null, "client_version": null, "connect_errno": null, "connect_error": null, "errno": null, "error": null, "error_list": null, "field_count": null, "host_info": null, "info": null, "insert_id": null, "protocol_version": null, "server_info": null, "server_version": null, "sqlstate": null, "stat": null, "thread_id": null, "warning_count": null }, "dbhost": "localhost", "dbname": "zortt_socialinno", "dbpw": "hDy4.&@Q&A)~11993381083", "dbuser": "zortt_admininno", "dev_http_host": "dev.zortt.com", "dev_status": null, "enable_commenting": 0, "enable_icon_banner": 0, "enable_notifications": 0, "enable_zcard_promo_banner": 0, "error": "No results were found for this search.", "expiration_date": null, "first_name": null, "force_color": 0, "force_font_color": 0, "id": "913", "is_active": 1, "is_template": 0, "last_name": null, "live_http_host": "zortt.com", "max_message_count": 0, "message_count": 0, "newsletter_section_text": null, "password": null, "postal_code": null, "product_id": 1, "product_type": 0, "renewal_date": "2021-05-26 09:43:16", "secrows": 0, "section_comments": 0, "seo_indexing": 0, "single_address_field": null, "social_enabled": 0, "state_region": null, "street_address": null, "tags": null, "text_status": null, "theme_id": 1, "town_city": null, "use_template_id": null, "valid": true, "version": "1.1.8", "visible_address_location": false, "zc_desc": "", "zc_email": null, "zc_keyword": null, "zc_name": "Zcard", "zc_phone": null }] })
   }
 
   initData = () => {
     const { currentUser } = this.props;
     if (currentUser == null) this.props.signOut();
+    this.setState({ zcards: [] });
 
     this.props.GetUserZCards(
       'ZCardList',
@@ -171,22 +181,15 @@ class HomeScreen extends React.Component {
       'getZCardCountExpiringSoon',
       [],
       (expiringCount) => {
-        if (expiringCount && expiringCount > 0)
-          Toast.show({
-            type: 'info',
-            position: 'top',
-            text1: 'Information',
-            text2: 'You have cards that are expiring soon below. Simply click "Renew" on the card you need to renew to either renew your existing card, or upgrade to a different card product 😊'
-          });
       },
       (msg) => {
-        if(msg != undefined)
-        Toast.show({
-          type: 'error',
-          position: 'top',
-          text1: 'Error',
-          text2: msg + ' 😥'
-        });
+        if (msg != undefined)
+          Toast.show({
+            type: 'error',
+            position: 'top',
+            text1: 'Error',
+            text2: msg + ' 😥'
+          });
       }
     );
   }
@@ -243,6 +246,37 @@ class HomeScreen extends React.Component {
     this.props.navigation.navigate('EditCard', { zcard });
   }
 
+  deleteCard = () => {
+    const { selected_zcard_id, zcards } = this.state;
+    this.setState({ isDeleteModal: false});
+
+    this.props.deleteCard(
+      '/Zcard/delete-zcard.php',
+      {
+        zcard_id: selected_zcard_id
+      },
+      (msg) => {
+        let newZCards = zcards.filter(zcard => zcard.id != selected_zcard_id);
+        this.setState({ zcards: newZCards });
+
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          text1: 'Success',
+          text2: msg + ' 🎊'
+        });
+      },
+      (msg) => {
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Error',
+          text2: msg + ' 😥'
+        });
+      }
+    )
+  }
+
   renderMyCards = () => {
     const { zcards, isExpandedMyCards } = this.state;
 
@@ -284,7 +318,6 @@ class HomeScreen extends React.Component {
                   <HTMLView
                     value={data.item.ProductInfo.cost_term_text}
                   />
-                  {/* <Text size={18} color={colors.primary} > {data.item.ProductInfo.cost_term_text}</Text> */}
                 </Block>}
               </Block>
             </TouchableOpacity>
@@ -298,7 +331,7 @@ class HomeScreen extends React.Component {
                     <Text size={15} color={colors.white}>Edit</Text>
                   </Block>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => alert('delete-card.php page is comming')}>
+                <TouchableOpacity onPress={() => this.setState({ isDeleteModal: true, selected_zcard_id: data.item.id })}>
                   <Block style={{ height: '100%', width: 75, backgroundColor: 'red', alignItems: 'center', justifyContent: 'center' }}>
                     <Icon name="delete" family="antdesign" color={colors.white} size={15} />
                     <Text size={15} color={colors.white}>Delete</Text>
@@ -387,7 +420,7 @@ class HomeScreen extends React.Component {
   }
 
   render = () => {
-    const { zcards, user_partner_profiles, loading } = this.state;
+    const { zcards, user_partner_profiles, loading, isDeleteModal } = this.state;
 
     return (
       <KeyboardAvoidingView
@@ -402,6 +435,13 @@ class HomeScreen extends React.Component {
               {zcards.length == 0 && !loading && this.renderActiveCard()}
               {zcards.length > 0 && !loading && this.renderMyCards()}
               {user_partner_profiles.length > 0 && !loading && this.renderEnterpriseCards()}
+              <DeleteModal
+                isVisible={isDeleteModal}
+                label='Are you sure you want to remove this Zcard? You cannot recover a deleted Zcard or any related media, files, or other content.'
+                onBackdropPress={() => this.setState({ isDeleteModal: false })}
+                onCancel={() => this.setState({ isDeleteModal: false })}
+                onDelete={this.deleteCard}
+              />
             </ScrollView>
           </Block>
           <Toast ref={(ref) => Toast.setRef(ref)} />
@@ -427,6 +467,7 @@ function mapDispatchToProps(dispatch) {
     getZCardCountExpiringSoon: (className, funcName, reqArray, successcb, errorcb) => CallClassFunction(className, funcName, reqArray, successcb, errorcb),
     setSelectedZCard: (zcard) => SetSelectedZCard(dispatch, zcard),
     zcard_zmodule_total_monthly: (id, funcName, reqArray, successcb, errorcb) => CallZCardClassFunction(id, funcName, reqArray, successcb, errorcb),
+    deleteCard: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
   };
 }
 export default connect(

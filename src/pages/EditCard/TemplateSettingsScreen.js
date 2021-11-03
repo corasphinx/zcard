@@ -17,6 +17,7 @@ import AwesomeLoading from 'react-native-awesome-loading';
 import Toast from 'react-native-toast-message';
 import { colors, commonStyles } from '../../styles';
 import { Dropdown } from 'react-native-material-dropdown';
+import DeleteModal from '../../components/DeleteModal';
 
 import {
   CallZCardClassFunction,
@@ -33,13 +34,15 @@ class TemplateSettingsScreen extends React.Component {
       zcard_templates: [],
       save: false,
       selectedTemplateID: null,
-      selectedTemplateLabel: 'No Template'
+      selectedTemplateLabel: 'No Template',
+      isDeleteModal: false,
+      deleting: false
     }
   }
 
   componentDidMount = () => {
     const { selectedZCard } = this.props;
-    
+
     if (selectedZCard)
       this.props.fetchZCardTemplates(
         selectedZCard.id,
@@ -110,8 +113,29 @@ class TemplateSettingsScreen extends React.Component {
     }
   }
 
+  deleteCard = () => {
+    const { selectedZCard } = this.props;
+    this.setState({ deleting: true, isDeleteModal: false });
+    this.props.deleteCard(
+      '/Zcard/delete-zcard.php',
+      {
+        zcard_id: selectedZCard.id
+      },
+      () => this.props.navigation.goBack(),
+      (msg) => {
+        this.setState({ deleting: false });
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Error',
+          text2: msg + ' 😥'
+        });
+      }
+    )
+  }
+
   render = () => {
-    const { zcard_templates, saving, selectedTemplateLabel } = this.state;
+    const { zcard_templates, saving, deleting, selectedTemplateLabel, isDeleteModal } = this.state;
     return (
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : null}
@@ -143,7 +167,34 @@ class TemplateSettingsScreen extends React.Component {
               size='large'
               onPress={() => this.save()}
             > Save Template Setting</Button>
+            <Block>
+              <Block style={commonStyles.divider} />
+              <Block row>
+                <Button
+                  color={colors.pink}
+                  icon='delete' iconFamily='AntDesign' iconSize={18}
+                  textStyle={{ fontSize: 18 }}
+                  loading={deleting}
+                  size='small'
+                  onPress={() => this.setState({ isDeleteModal: true })}
+                > Delete</Button>
+                <Button
+                  color={colors.blue}
+                  icon='plussquareo' iconFamily='AntDesign' iconSize={18}
+                  textStyle={{ fontSize: 18 }}
+                  size='small'
+                  onPress={() => this.navigation.navigate('ZModule')}
+                > ZModule</Button>
+              </Block>
+            </Block>
           </Block>
+          <DeleteModal
+            isVisible={isDeleteModal}
+            label='Are you sure you want to remove this Zcard? You cannot recover a deleted Zcard or any related media, files, or other content.'
+            onBackdropPress={() => this.setState({ isDeleteModal: false })}
+            onCancel={() => this.setState({ isDeleteModal: false })}
+            onDelete={this.deleteCard}
+          />
           <Toast ref={(ref) => Toast.setRef(ref)} />
         </SafeAreaView>
       </KeyboardAvoidingView>
@@ -161,6 +212,7 @@ function mapDispatchToProps(dispatch) {
   return {
     fetchZCardTemplates: (id, funcName, reqArray, successcb, errorcb) => CallZCardClassFunction(id, funcName, reqArray, successcb, errorcb),
     save_use_template_id: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
+    deleteCard: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
   };
 }
 export default connect(
