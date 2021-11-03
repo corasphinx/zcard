@@ -172,7 +172,16 @@ class HomeScreen extends React.Component {
         'Account',
         'actualTotalZBucks',
         [],
-        (totalZBucks) => this.setState({ totalZBucks }),
+        (totalZBucks) => {
+          this.timerId = setInterval(()=>{
+            if(this.state.totalZBucks >= totalZBucks){
+              clearInterval(this.timerId);
+              this.setState({totalZBucks});
+            }else{
+              this.setState({totalZBucks : this.state.totalZBucks + 10});
+            }
+          }, 20);
+        },
         (msg) => {
           Toast.show({
             type: 'error',
@@ -234,7 +243,7 @@ class HomeScreen extends React.Component {
         <Block row style={styles.cardline}>
           <Icon size={22} name='money' family='Font-Awesome' color={colors.white} />
           <Text size={16} color={colors.white} > Zbuck Wallet:</Text>
-          <Text bold italic size={18} color={colors.pink}> ${totalZBucks}</Text>
+          <Text bold italic size={20} color={colors.pink}> ${totalZBucks}</Text>
         </Block>
         <Block style={{ alignItems: 'flex-end' }}>
           <Button
