@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 
 import {
   StyleSheet,
+  Image,
   Dimensions,
   SafeAreaView,
   KeyboardAvoidingView,
@@ -11,18 +12,20 @@ import {
 import {
   Block,
   Button,
+  Input,
   Text,
 } from 'galio-framework';
 import AwesomeLoading from 'react-native-awesome-loading';
+import { Collapse, CollapseHeader, CollapseBody } from 'accordion-collapse-react-native';
 import Toast from 'react-native-toast-message';
 import { colors, commonStyles } from '../../styles';
-import { Dropdown } from 'react-native-material-dropdown';
-import DeleteModal from '../../components/DeleteModal';
 
 import {
-  CallZCardClassFunction,
   CallController,
+  CallClassFunction
 } from '../../redux/actions';
+import { ScrollView } from 'react-native-gesture-handler';
+import { hostname } from '../../constant';
 
 const { width, height } = Dimensions.get('screen');
 
@@ -30,100 +33,46 @@ class ZModule extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      loading: true,
-      zcard_templates: [],
-      save: false,
-      selectedTemplateID: null,
-      selectedTemplateLabel: 'No Template',
-      isDeleteModal: false,
-      deleting: false
+      loading: false,
+      searchText: '',
+      products: [],
     }
   }
 
   componentDidMount = () => {
     const { selectedZCard } = this.props;
-
-    if (selectedZCard)
-      this.props.fetchZCardTemplates(
-        selectedZCard.id,
-        'fetch_zcard_templates',
-        [],
-        (templates) => {
-          if (templates)
-            templates.map(template => {
-              if (selectedZCard.use_template_id == template.id)
-                this.setState({
-                  selectedTemplateID: template.id,
-                  selectedTemplateLabel: template.zc_name,
+    this.props.fetchActiveCategoryProducts(
+      'Products',
+      'activeCategoryProducts',
+      [8],
+      (productIds) => {
+        if (productIds)
+          productIds.map(id =>
+            this.props.fetchProduct(
+              '/Chatter/App/fetchProduct.php',
+              { id },
+              (product) => {
+                if (product.valid)
+                  this.setState({
+                    products: [...this.state.products, product]
+                  })
+              },
+              (msg) => {
+                Toast.show({
+                  type: 'error',
+                  position: 'top',
+                  text1: 'Error',
+                  text2: msg + ' 😥'
                 });
-              this.setState({
-                zcard_templates: [...this.state.zcard_templates,
-                {
-                  id: template.id,
-                  value: template.id,
-                  label: template.zc_name
-                }
-                ]
-              })
-            })
+              },
+              true
+            )
+          );
+        else
           this.setState({ loading: false });
-        },
-        (msg) => {
-          this.setState({ loading: false });
-          Toast.show({
-            type: 'error',
-            position: 'top',
-            text1: 'Error',
-            text2: msg + ' 😥'
-          });
-        }
-      )
-  }
-
-  save = () => {
-    const { selectedZCard } = this.props;
-    const { selectedTemplateID } = this.state;
-    if (selectedTemplateID) {
-      this.setState({ saving: true });
-      this.props.save_use_template_id(
-        '/edit-zcard/save_use_template_id.php',
-        {
-          zcard_id: selectedZCard.id,
-          template_id: selectedTemplateID
-        },
-        (msg) => {
-          this.setState({ saving: false });
-          Toast.show({
-            type: 'success',
-            position: 'top',
-            text1: 'Success',
-            text2: msg + ' 🎉'
-          });
-        },
-        (msg) => {
-          this.setState({ saving: false });
-          Toast.show({
-            type: 'error',
-            position: 'top',
-            text1: 'Error',
-            text2: msg + ' 😥'
-          });
-        }
-      );
-    }
-  }
-
-  deleteCard = () => {
-    const { selectedZCard } = this.props;
-    this.setState({ deleting: true, isDeleteModal: false });
-    this.props.deleteCard(
-      '/Zcard/delete-zcard.php',
-      {
-        zcard_id: selectedZCard.id
       },
-      () => this.props.navigation.goBack(),
       (msg) => {
-        this.setState({ deleting: false });
+        this.setState({ loading: false });
         Toast.show({
           type: 'error',
           position: 'top',
@@ -131,11 +80,47 @@ class ZModule extends React.Component {
           text2: msg + ' 😥'
         });
       }
-    )
+    );
+  }
+
+  renderProducts = () => {
+    const { products, searchText } = this.state;
+    if (products)
+      return products
+        .filter(products => searchText == '' || products.product_name.toLowerCase().indexOf(searchText.toLowerCase()) >= 0 || products.product_desc.toLowerCase().indexOf(searchText.toLowerCase()) >= 0)
+        .map((product, idx) =>
+          <Collapse
+            key={product.id}
+            style={{ marginHorizontal: 10, marginVertical: 5 }}
+          >
+            <CollapseHeader>
+              <Block row space='between' style={[commonStyles.collapseTitle, commonStyles.shadow]}>
+                <Text size={18} bold color={colors.white}>{idx + 1}. {product.product_name}</Text>
+                <Button
+                  color={colors.blue}
+                  icon='plussquareo' iconFamily='AntDesign' iconSize={18}
+                  textStyle={{ fontSize: 18 }}
+                  style={{ width: 100, height: 30, margin: 0 }}
+                  onPress={() => this.props.navigation.navigate('ZModule')}
+                > Add</Button>
+              </Block>
+            </CollapseHeader>
+            <CollapseBody
+              style={[commonStyles.shadow, commonStyles.collapseBody]}
+            >
+              {product.photo_src != null && <Block center>
+                <Image
+                  style={styles.image}
+                  source={{ uri: hostname + product.photo_src }}
+                />
+              </Block>}
+              <Text italic size={18} color={colors.primary}>{product.product_desc}</Text>
+            </CollapseBody>
+          </Collapse>
+        );
   }
 
   render = () => {
-    const { zcard_templates, saving, deleting, selectedTemplateLabel, isDeleteModal } = this.state;
     return (
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : null}
@@ -143,58 +128,25 @@ class ZModule extends React.Component {
       >
         <SafeAreaView style={{ flex: 1 }}>
           <AwesomeLoading indicatorId={7} size={80} isActive={this.state.loading} />
-          <Block center style={styles.container}>
-            <Block style={[commonStyles.card, commonStyles.shadow, { backgroundColor: colors.primaryLight, padding: 10 }]}>
-              <Text size={18} color={colors.white}>If you use a template, you will not be able to modify any information or add custom Zmodules.</Text>
+          <Block style={styles.container}>
+            <Block style={[commonStyles.topBar, commonStyles.shadow, { backgroundColor: colors.background }]}>
+              <Input
+                placeholder='Search...'
+                placeholderTextColor={colors.grey}
+                icon='search1'
+                family='AntDesign'
+                color={colors.primary}
+                iconSize={18}
+                fontSize={18}
+                iconColor={colors.primary}
+                style={{ width: width - 20 }}
+                onChangeText={(searchText) => this.setState({ searchText })}
+              />
             </Block>
-            <Dropdown
-              label="Card Template"
-              value={selectedTemplateLabel}
-              textColor={colors.primary}
-              labelFontSize={16}
-              fontSize={18}
-              dropdownPosition={0}
-              pickerStyle={{ borderRadius: 10, height: 300 }}
-              containerStyle={{ width: width * 0.7 }}
-              data={zcard_templates}
-              onChangeText={(selectedTemplateID) => this.setState({ selectedTemplateID })}
-            />
-            <Button
-              color={colors.green}
-              icon='save' iconFamily='AntDesign' iconSize={18}
-              textStyle={{ fontSize: 18 }}
-              loading={saving}
-              size='large'
-              onPress={() => this.save()}
-            > Save Template Setting</Button>
-            <Block>
-              <Block style={commonStyles.divider} />
-              <Block row>
-                <Button
-                  color={colors.pink}
-                  icon='delete' iconFamily='AntDesign' iconSize={18}
-                  textStyle={{ fontSize: 18 }}
-                  loading={deleting}
-                  size='small'
-                  onPress={() => this.setState({ isDeleteModal: true })}
-                > Delete</Button>
-                <Button
-                  color={colors.blue}
-                  icon='plussquareo' iconFamily='AntDesign' iconSize={18}
-                  textStyle={{ fontSize: 18 }}
-                  size='small'
-                  onPress={() => this.navigation.navigate('ZModule')}
-                > ZModule</Button>
-              </Block>
-            </Block>
+            <ScrollView style={{ marginBottom: 10 }}>
+              {this.renderProducts()}
+            </ScrollView>
           </Block>
-          <DeleteModal
-            isVisible={isDeleteModal}
-            label='Are you sure you want to remove this Zcard? You cannot recover a deleted Zcard or any related media, files, or other content.'
-            onBackdropPress={() => this.setState({ isDeleteModal: false })}
-            onCancel={() => this.setState({ isDeleteModal: false })}
-            onDelete={this.deleteCard}
-          />
           <Toast ref={(ref) => Toast.setRef(ref)} />
         </SafeAreaView>
       </KeyboardAvoidingView>
@@ -210,8 +162,8 @@ function mapStateToProps(state) {
 }
 function mapDispatchToProps(dispatch) {
   return {
-    fetchZCardTemplates: (id, funcName, reqArray, successcb, errorcb) => CallZCardClassFunction(id, funcName, reqArray, successcb, errorcb),
-    save_use_template_id: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
+    fetchActiveCategoryProducts: (className, funcName, reqArray, successcb, errorcb) => CallClassFunction(className, funcName, reqArray, successcb, errorcb),
+    fetchProduct: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
   };
 }
 export default connect(
@@ -222,24 +174,14 @@ export default connect(
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.backgroundLight,
+    backgroundColor: colors.background,
     width,
     height,
   },
-  card: {
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: 10,
-    backgroundColor: colors.yellow,
-    margin: 10
-  },
-  cardline: {
-    alignItems: 'center',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-    backgroundColor: colors.darkGray,
-    marginTop: 5
-  },
+  image: {
+    resizeMode: 'stretch',
+    width: width - 40,
+    height: width - 40,
+    borderRadius: 8
+  }
 });

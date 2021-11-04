@@ -187,7 +187,7 @@ class TemplateSettingsScreen extends React.Component {
                   icon='plussquareo' iconFamily='AntDesign' iconSize={18}
                   textStyle={{ fontSize: 18 }}
                   size='small'
-                  onPress={() => this.navigation.navigate('ZModule')}
+                  onPress={() => this.props.navigation.navigate('ZModule')}
                 > ZModule</Button>
               </Block>
             </Block>
