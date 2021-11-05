@@ -23,14 +23,14 @@ const ENTRIES = [
   },
   {
     index: 1,
-    title: 'Instagram Embed Settings'
+    title: 'Facebook Embed Settings'
   },
   {
     index: 2,
     title: 'Color Settings'
   }
 ]
-class InstagramEmbedScreen extends Component {
+class FacebookEmbedScreen extends Component {
 
   constructor(props) {
     super(props);
@@ -58,7 +58,7 @@ class InstagramEmbedScreen extends Component {
         <Image
           style={styles.avatar}
           source={{ uri: hostname + '/dashboard/assets/images/zortt-shield-icon-75x75.png' }} />
-        <Text italic size={16} color={colors.primaryLight} style={{ flexShrink: 1 }}>An Instagram Zmodule is a fantastic way to demonstrate your brand, personality, business model, or other interests from your Instagram page.</Text>
+        <Text italic size={16} color={colors.primaryLight} style={{ flexShrink: 1 }}>A Facebook Zmodule is a fantastic way to demonstrate your brand, personality, business model, or other interests from your Facebook page.</Text>
       </Block>
       <Block style={{ margin: 10 }}>
         <Text
@@ -79,16 +79,16 @@ class InstagramEmbedScreen extends Component {
         <Image
           style={styles.avatar}
           source={{ uri: hostname + '/dashboard/assets/images/zortt-shield-icon-75x75.png' }} />
-        <Text italic size={16} color={colors.primaryLight} style={{ flexShrink: 1 }}>Your URL must be eligible for a valid Instagram embed code. You cannot embed every Instagram link, so make sure your page can be embedded publicly before attempting to use this Zmodule.</Text>
+        <Text italic size={16} color={colors.primaryLight} style={{ flexShrink: 1 }}>Your URL must be eligible for valid Facebook embed code. You cannot embed every Facebook page, so make sure your page can be embedded publicly before attempting to use this Zmodule.</Text>
       </Block>
       <Block style={commonStyles.divider} />
       <Block style={{ margin: 10 }}>
         <Text
           style={styles.label}
-          size={16}>Instagram Embed URL</Text>
+          size={16}>Facebook Embed URL</Text>
         <Input
           style={styles.inputBox} color={colors.primary} fontSize={18}
-          icon='instagram' family='AntDesign' iconSize={18} iconColor={colors.primary}
+          icon='facebook-square' family='AntDesign' iconSize={18} iconColor={colors.primary}
         />
       </Block>
     </Block>
@@ -204,7 +204,7 @@ function mapDispatchToProps(dispatch) {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(InstagramEmbedScreen);
+)(FacebookEmbedScreen);
 
 const styles = StyleSheet.create({
   safeArea: {
