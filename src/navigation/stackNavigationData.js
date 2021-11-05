@@ -14,6 +14,7 @@ import LeadFormScreen from '../pages/EditCard/ZModules/LeadFormScreen';
 import YouTubeEmbedScreen from '../pages/EditCard/ZModules/YouTubeEmbedScreen';
 import ZLiveSectionScreen from '../pages/EditCard/ZModules/ZLiveSectionScreen';
 import ZMarketSectionScreen from '../pages/EditCard/ZModules/ZMarketSectionScreen';
+import BusinessSearchModuleScreen from '../pages/EditCard/ZModules/BusinessSearchModuleScreen';
 import { colors, fonts } from '../styles';
 
 const headerLeftComponent = (props) => {
@@ -189,6 +190,18 @@ const StackNavigationData = [
     name: 'ZMarketSection',
     title: 'ZMarket Section',
     component: ZMarketSectionScreen,
+    headerLeft: headerLeftComponent,
+    headerBackground: { source: headerBackground },
+    headerTitleStyle: {
+      fontFamily: fonts.primaryRegular,
+      color: colors.white,
+      fontSize: 18,
+    },
+  },
+  {
+    name: 'BusinessSearchModule',
+    title: 'Business Search',
+    component: BusinessSearchModuleScreen,
     headerLeft: headerLeftComponent,
     headerBackground: { source: headerBackground },
     headerTitleStyle: {
