@@ -90,4 +90,33 @@ export default StyleSheet.create({
     shadowRadius: 3,
     elevation: 5,
   },
+  BottomBar: {
+    borderWidth: 1,
+    backgroundColor: colors.backgroundLight,
+    borderColor: colors.border,
+    padding: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 2, height: 3, },
+    shadowOpacity: 0.8,
+    shadowRadius: 3,
+    elevation: 6,
+  },
+
+  // for Carousel
+  slider: {
+    overflow: 'visible' // for custom animations
+  },
+  sliderContentContainer: {
+    paddingVertical: 10 // for custom animation
+  },
+  paginationContainer: {
+    paddingVertical: 8
+  },
+  paginationDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginHorizontal: 8
+  },
+  // end Carousel
 });

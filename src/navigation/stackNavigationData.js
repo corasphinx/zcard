@@ -10,6 +10,7 @@ import NewsletterScreen from '../pages/EditCard/NewsletterScreen';
 import SectionEditScreen from '../pages/EditCard/SectionEditScreen';
 import CreateSectionScreen from '../pages/EditCard/CreateSectionScreen';
 import ZModuleScreen from '../pages/EditCard/ZModuleScreen';
+import LeadFormScreen from '../pages/EditCard/ZModules/LeadFormScreen';
 import { colors, fonts } from '../styles';
 
 const headerLeftComponent = (props) => {
@@ -144,6 +145,20 @@ const StackNavigationData = [
       fontSize: 18,
     },
   },
+  // ZModules Start ------------------------------
+  {
+    name: 'LeadForm',
+    title: 'Lead Form',
+    component: LeadFormScreen,
+    headerLeft: headerLeftComponent,
+    headerBackground: { source: headerBackground },
+    headerTitleStyle: {
+      fontFamily: fonts.primaryRegular,
+      color: colors.white,
+      fontSize: 18,
+    },
+  },
+  // ZModules End ---------------------------------
 ]
 
 export default StackNavigationData;

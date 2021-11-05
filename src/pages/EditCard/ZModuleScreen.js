@@ -29,11 +29,11 @@ import { hostname } from '../../constant';
 
 const { width, height } = Dimensions.get('screen');
 
-class ZModule extends React.Component {
+class ZModuleScreen extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      loading: false,
+      loading: true,
       searchText: '',
       products: [],
     }
@@ -68,8 +68,7 @@ class ZModule extends React.Component {
               true
             )
           );
-        else
-          this.setState({ loading: false });
+        this.setState({ loading: false });
       },
       (msg) => {
         this.setState({ loading: false });
@@ -101,8 +100,27 @@ class ZModule extends React.Component {
                   icon='plussquareo' iconFamily='AntDesign' iconSize={18}
                   textStyle={{ fontSize: 18 }}
                   style={{ width: 100, height: 30, margin: 0 }}
-                  onPress={() => this.props.navigation.navigate('ZModule')}
+                  onPress={() => this.props.navigation.navigate(product.product_name.replace(/\s/g, ''), { product })}
                 > Add</Button>
+                {/* 17 Screens
+                  LeadForm
+                  YouTubeEmbed
+                  ZLiveSection
+                  ZMarketSection
+                  BusinessSearchModule
+                  ShortURL
+                  EmbedSection
+                  TwitterEmbed
+                  InstagramEmbed
+                  Ztext
+                  FacebookEmbed
+                  VideoEmbed
+                  PDFEmbed
+                  TextSection
+                  ImageSection
+                  HTMLSection
+                  JobOpenings 
+                  */}
               </Block>
             </CollapseHeader>
             <CollapseBody
@@ -169,7 +187,7 @@ function mapDispatchToProps(dispatch) {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(ZModule);
+)(ZModuleScreen);
 
 const styles = StyleSheet.create({
   container: {
