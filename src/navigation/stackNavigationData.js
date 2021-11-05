@@ -24,6 +24,7 @@ import VideoEmbedScreen from '../pages/EditCard/ZModules/VideoEmbedScreen';
 import PDFEmbedScreen from '../pages/EditCard/ZModules/PDFEmbedScreen';
 import ImageSectionScreen from '../pages/EditCard/ZModules/ImageSectionScreen';
 import HTMLSectionScreen from '../pages/EditCard/ZModules/HTMLSectionScreen';
+import JobOpeningsScreen from '../pages/EditCard/ZModules/JobOpeningsScreen';
 import { colors, fonts } from '../styles';
 
 const headerLeftComponent = (props) => {
@@ -319,6 +320,18 @@ const StackNavigationData = [
     name: 'HTMLSection',
     title: 'HTML Section',
     component: HTMLSectionScreen,
+    headerLeft: headerLeftComponent,
+    headerBackground: { source: headerBackground },
+    headerTitleStyle: {
+      fontFamily: fonts.primaryRegular,
+      color: colors.white,
+      fontSize: 18,
+    },
+  },
+  {
+    name: 'JobOpenings',
+    title: 'Job Openings',
+    component: JobOpeningsScreen,
     headerLeft: headerLeftComponent,
     headerBackground: { source: headerBackground },
     headerTitleStyle: {
