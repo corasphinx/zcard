@@ -342,6 +342,18 @@ const StackNavigationData = [
     },
   },
   {
+    name: 'Ztext',
+    title: 'Ztext is comming soon',
+    component: TextSectionScreen,
+    headerLeft: headerLeftComponent,
+    headerBackground: { source: headerBackground },
+    headerTitleStyle: {
+      fontFamily: fonts.primaryRegular,
+      color: colors.white,
+      fontSize: 18,
+    },
+  },
+  {
     name: 'JobOpenings',
     title: 'Job Openings',
     component: JobOpeningsScreen,
