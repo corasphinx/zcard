@@ -15,6 +15,7 @@ import YouTubeEmbedScreen from '../pages/EditCard/ZModules/YouTubeEmbedScreen';
 import ZLiveSectionScreen from '../pages/EditCard/ZModules/ZLiveSectionScreen';
 import ZMarketSectionScreen from '../pages/EditCard/ZModules/ZMarketSectionScreen';
 import BusinessSearchModuleScreen from '../pages/EditCard/ZModules/BusinessSearchModuleScreen';
+import ShortURLScreen from '../pages/EditCard/ZModules/ShortURLScreen';
 import { colors, fonts } from '../styles';
 
 const headerLeftComponent = (props) => {
@@ -202,6 +203,18 @@ const StackNavigationData = [
     name: 'BusinessSearchModule',
     title: 'Business Search',
     component: BusinessSearchModuleScreen,
+    headerLeft: headerLeftComponent,
+    headerBackground: { source: headerBackground },
+    headerTitleStyle: {
+      fontFamily: fonts.primaryRegular,
+      color: colors.white,
+      fontSize: 18,
+    },
+  },
+  {
+    name: 'ShortURL',
+    title: 'Short URL',
+    component: ShortURLScreen,
     headerLeft: headerLeftComponent,
     headerBackground: { source: headerBackground },
     headerTitleStyle: {
