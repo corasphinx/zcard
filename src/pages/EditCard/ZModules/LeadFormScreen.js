@@ -32,7 +32,7 @@ const ENTRIES = [
   },
   {
     index: 3,
-    title: 'Design'
+    title: 'Color Settings'
   },
   {
     index: 4,

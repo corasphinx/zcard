@@ -23,14 +23,14 @@ const ENTRIES = [
   },
   {
     index: 1,
-    title: 'YouTube Embed Settings'
+    title: 'Stream Options'
   },
   {
     index: 2,
     title: 'Color Settings'
   }
 ]
-class YouTubeEmbedScreen extends Component {
+class ZLiveSectionScreen extends Component {
 
   constructor(props) {
     super(props);
@@ -58,7 +58,7 @@ class YouTubeEmbedScreen extends Component {
         <Image
           style={styles.avatar}
           source={{ uri: hostname + '/dashboard/assets/images/zortt-shield-icon-75x75.png' }} />
-        <Text italic size={16} color={colors.primaryLight} style={{ flexShrink: 1 }}>A YouTube Zmodule is a fantastic way to demonstrate your brand, personality, business model, or other interests. You can embed a single video, most recent channel uploads, or a playlist. Please choose the title of your Zmodule below!</Text>
+        <Text italic size={16} color={colors.primaryLight} style={{ flexShrink: 1 }}>A ZLive Zmodule is a fantastic way to live stream to family, friends, customers, and more.</Text>
       </Block>
       <Block style={{ margin: 10 }}>
         <Text
@@ -79,26 +79,10 @@ class YouTubeEmbedScreen extends Component {
         <Image
           style={styles.avatar}
           source={{ uri: hostname + '/dashboard/assets/images/zortt-shield-icon-75x75.png' }} />
-        <Text italic size={16} color={colors.primaryLight} style={{ flexShrink: 1 }}>You can embed YouTube videos, playlists, or recent channel uploads. Please supply your YouTube channel's username, a playlist URL, or a direct video URL!</Text>
+        <Text italic size={16} color={colors.primaryLight} style={{ flexShrink: 1 }}>You can stream soon.</Text>
       </Block>
       <Block style={commonStyles.divider} />
-      <Block style={{ margin: 10 }}>
-        <Text
-          style={styles.label}
-          size={16}>YouTube Video or Playlist URL</Text>
-        <Input
-          style={styles.inputBox} color={colors.primary} fontSize={18}
-          icon='earth' family='AntDesign' iconSize={18} iconColor={colors.primary}
-        />
-      </Block>
-
-      <Radio color={colors.primary} radioOuterStyle={{ marginBottom: 5 }} label='YouTube Video / PlayList' initialValue={false} />
-      <Radio color={colors.primary} label='Recent Uploads (By UserName)' />
-
-      <Text bold size={16} color={colors.primary} style={{ marginTop: 10 }}>Video Example:</Text>
-      <Text italic size={14} color={colors.primaryLight} style={{ marginBottom: 10 }}>https://www.youtube.com/watch?v=VIDEO-ID-HERE</Text>
-      <Text bold size={16} color={colors.primary}>Playlist Example:</Text>
-      <Text italic size={14} color={colors.primaryLight} style={{ marginBottom: 10 }}>https://www.youtube.com/playlist?list=PLAYLIST-ID-HERE</Text>
+      <Text bold size={18} color={colors.primary}>Comming Fall of 2021!</Text>
     </Block>
   }
   renderScreen2 = (title, index) => {
@@ -212,7 +196,7 @@ function mapDispatchToProps(dispatch) {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(YouTubeEmbedScreen);
+)(ZLiveSectionScreen);
 
 const styles = StyleSheet.create({
   safeArea: {
