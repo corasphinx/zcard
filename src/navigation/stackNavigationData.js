@@ -22,6 +22,7 @@ import InstagramEmbedScreen from '../pages/EditCard/ZModules/InstagramEmbedScree
 import FacebookEmbedScreen from '../pages/EditCard/ZModules/FacebookEmbedScreen';
 import VideoEmbedScreen from '../pages/EditCard/ZModules/VideoEmbedScreen';
 import PDFEmbedScreen from '../pages/EditCard/ZModules/PDFEmbedScreen';
+import ImageSectionScreen from '../pages/EditCard/ZModules/ImageSectionScreen';
 import { colors, fonts } from '../styles';
 
 const headerLeftComponent = (props) => {
@@ -293,6 +294,18 @@ const StackNavigationData = [
     name: 'PDFEmbed',
     title: 'PDF Embed',
     component: PDFEmbedScreen,
+    headerLeft: headerLeftComponent,
+    headerBackground: { source: headerBackground },
+    headerTitleStyle: {
+      fontFamily: fonts.primaryRegular,
+      color: colors.white,
+      fontSize: 18,
+    },
+  },
+  {
+    name: 'ImageSection',
+    title: 'Image Display Section',
+    component: ImageSectionScreen,
     headerLeft: headerLeftComponent,
     headerBackground: { source: headerBackground },
     headerTitleStyle: {

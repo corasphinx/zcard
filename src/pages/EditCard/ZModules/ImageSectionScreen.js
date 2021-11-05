@@ -25,7 +25,7 @@ const ENTRIES = [
   },
   {
     index: 1,
-    title: 'PDF Settings'
+    title: 'Image Settings'
   },
   {
     index: 2,
@@ -36,7 +36,7 @@ const ENTRIES = [
     title: 'Color Settings'
   }
 ]
-class PDFEmbedScreen extends Component {
+class ImageSectionScreen extends Component {
 
   constructor(props) {
     super(props);
@@ -49,7 +49,7 @@ class PDFEmbedScreen extends Component {
   pick = async () => {
     try {
       const res = await DocumentPicker.pick({
-        type: [DocumentPicker.types.pdf],
+        type: [DocumentPicker.types.images],
       });
       // this.setState({ pdfFile: Array.isArray(res) ? res[0] : res });
     } catch (err) {
@@ -83,7 +83,7 @@ class PDFEmbedScreen extends Component {
         <Image
           style={styles.avatar}
           source={{ uri: hostname + '/dashboard/assets/images/zortt-shield-icon-75x75.png' }} />
-        <Text italic size={16} color={colors.primaryLight} style={{ flexShrink: 1 }}>PDF Section Title Your title will appear at the top of the Zmodule. It does not have the be the title of the actual PDF itself.</Text>
+        <Text italic size={16} color={colors.primaryLight} style={{ flexShrink: 1 }}>A Zcard Image Section is a perfect way to display a photo on your Zcard!</Text>
       </Block>
       <Block style={{ margin: 10 }}>
         <Text
@@ -105,23 +105,21 @@ class PDFEmbedScreen extends Component {
         <Image
           style={styles.avatar}
           source={{ uri: hostname + '/dashboard/assets/images/zortt-shield-icon-75x75.png' }} />
-        <Text italic size={16} color={colors.primaryLight} style={{ flexShrink: 1 }}>A PDF upload is a fantastic way to share resources, major releases, guidebooks, handouts, and more!</Text>
+        <Text italic size={16} color={colors.primaryLight} style={{ flexShrink: 1 }}>A short label for your image is a very great way to quickly let search engines, screen readers, and handicap accessible tools relay information to your visitors.</Text>
       </Block>
       <Block style={commonStyles.divider} />
       <Block style={{ margin: 10 }}>
         <Text
           style={styles.label}
-          size={16}>PDF Title</Text>
+          size={16}>Image Label</Text>
         <Input
           style={styles.inputBox} color={colors.primary} fontSize={18}
-          icon='pdffile1' family='AntDesign' iconSize={18} iconColor={colors.primary}
-          help="You must enter the PDF Title below that you would like to display to users. This can differ from the actual filename of the PDF or the section title of your PDF Embed Zmodule."
-          bottomHelp
+          icon='image' family='Entypo' iconSize={18} iconColor={colors.primary}
         />
       </Block>
       <Block style={{ margin: 10 }}>
         <Block style={commonStyles.divider} />
-        <Text italic size={14} color={colors.primaryLight} style={{ flexShrink: 1 }}>You can easily upload a PDF file by either uploading the file from a compatible device, or by copying and pasting the full URL of your existing online PDF. You may only add 1 PDF to this PDF Embed Zmodule. You can click on the greyed out box to switch between the PDF upload and the direct link options depending on your preference.</Text>
+        <Text italic size={14} color={colors.primaryLight} style={{ flexShrink: 1 }}>You can easily add an image by either uploading your photo from a compatible device, or by copying and pasting the full URL of your existing online photo. You may only add 1 photo to this Image Zmodule. Click on the greyed out box to toggle between either option! Your settings will be saved for next time.</Text>
         <Block row style={{ alignItems: 'center' }}>
           <Text size={16} color={colors.primary}>Choose type :</Text>
           <Switch
@@ -145,7 +143,7 @@ class PDFEmbedScreen extends Component {
           <Input
             style={styles.inputBox} color={colors.primary} fontSize={18}
             icon='clouduploado' family='AntDesign' iconSize={18} iconColor={colors.primary}
-            help="Upload a PDF from your device to embed the file in your Zcard."
+            help="Upload an image from your computer to attach any photo to your Zcard."
             bottomHelp
             onPressIn={this.pick}
           />
@@ -157,8 +155,7 @@ class PDFEmbedScreen extends Component {
           <Input
             style={styles.inputBox} color={colors.primary} fontSize={18}
             icon='earth' family='AntDesign' iconSize={18} iconColor={colors.primary}
-            help="You can use the field below to use a web URL for a PDF that is already on the internet.
-          This is a great way to use our Media Center and share PDF embeds across the web."
+            help="You can use the field below to use a web URL for a photo already on the internet. This is a great way to use our Media Center and share images across the web."
             bottomHelp
           />
         </Block>}
@@ -173,17 +170,17 @@ class PDFEmbedScreen extends Component {
         <Image
           style={styles.avatar}
           source={{ uri: hostname + '/dashboard/assets/images/zortt-shield-icon-75x75.png' }} />
-        <Text italic size={16} color={colors.primaryLight} style={{ flexShrink: 1 }}>Write a description for your PDF to display underneath and let visitors know what they are looking at. A well written caption is a great way to improve your business' online exposure, with search engine optimization to boost your rankings throughout the internet.</Text>
+        <Text italic size={16} color={colors.primaryLight} style={{ flexShrink: 1 }}>Write a caption for your photo to display underneath and let visitors know what they are looking at. A well written caption is a great way to improve your business' online exposure, with search engine optimization to boost your rankings throughout the internet.</Text>
       </Block>
       <Block style={commonStyles.divider} />
       <Block style={{ margin: 10 }}>
         <Text
           style={styles.label}
-          size={16}>PDF Description</Text>
+          size={16}>Image Caption</Text>
         <TextInput
           multiline
           numberOfLines={3}
-          placeholder='Input Description...'
+          placeholder='Input caption...'
           onChangeText={(text_sectionDescription) => console.info(text_sectionDescription)}
           style={styles.description}>
         </TextInput>
@@ -301,7 +298,7 @@ function mapDispatchToProps(dispatch) {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(PDFEmbedScreen);
+)(ImageSectionScreen);
 
 const styles = StyleSheet.create({
   safeArea: {
