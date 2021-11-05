@@ -18,6 +18,7 @@ import BusinessSearchModuleScreen from '../pages/EditCard/ZModules/BusinessSearc
 import ShortURLScreen from '../pages/EditCard/ZModules/ShortURLScreen';
 import EmbedSectionScreen from '../pages/EditCard/ZModules/EmbedSectionScreen';
 import TwitterEmbedScreen from '../pages/EditCard/ZModules/TwitterEmbedScreen';
+import InstagramEmbedScreen from '../pages/EditCard/ZModules/InstagramEmbedScreen';
 import { colors, fonts } from '../styles';
 
 const headerLeftComponent = (props) => {
@@ -241,6 +242,18 @@ const StackNavigationData = [
     name: 'TwitterEmbed',
     title: 'Twitter Embed',
     component: TwitterEmbedScreen,
+    headerLeft: headerLeftComponent,
+    headerBackground: { source: headerBackground },
+    headerTitleStyle: {
+      fontFamily: fonts.primaryRegular,
+      color: colors.white,
+      fontSize: 18,
+    },
+  },
+  {
+    name: 'InstagramEmbed',
+    title: 'Instagram Embed',
+    component: InstagramEmbedScreen,
     headerLeft: headerLeftComponent,
     headerBackground: { source: headerBackground },
     headerTitleStyle: {

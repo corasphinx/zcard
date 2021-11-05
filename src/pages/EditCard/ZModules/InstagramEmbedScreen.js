@@ -23,14 +23,14 @@ const ENTRIES = [
   },
   {
     index: 1,
-    title: 'Twitter Embed URL'
+    title: 'YouTube Embed Settings'
   },
   {
     index: 2,
     title: 'Color Settings'
   }
 ]
-class TwitterEmbedScreen extends Component {
+class InstagramEmbedScreen extends Component {
 
   constructor(props) {
     super(props);
@@ -58,7 +58,7 @@ class TwitterEmbedScreen extends Component {
         <Image
           style={styles.avatar}
           source={{ uri: hostname + '/dashboard/assets/images/zortt-shield-icon-75x75.png' }} />
-        <Text italic size={16} color={colors.primaryLight} style={{ flexShrink: 1 }}>A Twitter Zmodule is a fantastic way to demonstrate your brand, personality, business model, or other interests from your Twitter page.</Text>
+        <Text italic size={16} color={colors.primaryLight} style={{ flexShrink: 1 }}>An Instagram Zmodule is a fantastic way to demonstrate your brand, personality, business model, or other interests from your Instagram page.</Text>
       </Block>
       <Block style={{ margin: 10 }}>
         <Text
@@ -79,18 +79,16 @@ class TwitterEmbedScreen extends Component {
         <Image
           style={styles.avatar}
           source={{ uri: hostname + '/dashboard/assets/images/zortt-shield-icon-75x75.png' }} />
-        <Text italic size={16} color={colors.primaryLight} style={{ flexShrink: 1 }}>Your URL must be eligible for a valid Twitter embed code. You cannot embed every Twitter link, so make sure your page can be embedded publicly before attempting to use this Zmodule.</Text>
+        <Text italic size={16} color={colors.primaryLight} style={{ flexShrink: 1 }}>Your URL must be eligible for a valid Instagram embed code. You cannot embed every Instagram link, so make sure your page can be embedded publicly before attempting to use this Zmodule.</Text>
       </Block>
       <Block style={commonStyles.divider} />
       <Block style={{ margin: 10 }}>
         <Text
           style={styles.label}
-          size={16}>Twitter Embed URL</Text>
+          size={16}>Instagram Embed URL</Text>
         <Input
           style={styles.inputBox} color={colors.primary} fontSize={18}
-          icon='twitter' family='AntDesign' iconSize={18} iconColor={colors.primary}
-          help="You can find your URL 'https://twitter.com/username' and save it here to embed your recent posts."
-          bottomHelp
+          icon='instagram' family='AntDesign' iconSize={18} iconColor={colors.primary}
         />
       </Block>
     </Block>
@@ -206,7 +204,7 @@ function mapDispatchToProps(dispatch) {
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(TwitterEmbedScreen);
+)(InstagramEmbedScreen);
 
 const styles = StyleSheet.create({
   safeArea: {

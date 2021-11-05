@@ -88,7 +88,7 @@ class YouTubeEmbedScreen extends Component {
           size={16}>YouTube Video or Playlist URL</Text>
         <Input
           style={styles.inputBox} color={colors.primary} fontSize={18}
-          icon='earth' family='AntDesign' iconSize={18} iconColor={colors.primary}
+          icon='youtube' family='AntDesign' iconSize={18} iconColor={colors.primary}
         />
       </Block>
 
