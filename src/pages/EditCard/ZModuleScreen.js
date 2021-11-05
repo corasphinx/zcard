@@ -103,16 +103,16 @@ class ZModuleScreen extends React.Component {
                   onPress={() => this.props.navigation.navigate(product.product_name.replace(/\s/g, ''), { product })}
                 > Add</Button>
                 {/* 17 Screens
-                  LeadForm // HTML Editor
+                  LeadForm // HTML Editor X
                   YouTubeEmbed
                   ZLiveSection
                   ZMarketSection
                   BusinessSearchModule
-                  ShortURL  // incompleted
+                  ShortURL  // incompleted  X
                   EmbedSection  // HTML Editor
                   TwitterEmbed
                   InstagramEmbed
-                  Ztext // skipped
+                  Ztext // skipped  X
                   FacebookEmbed
                   VideoEmbed
                   PDFEmbed

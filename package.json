@@ -54,6 +54,7 @@
     "react-native-snap-carousel": "^3.9.1",
     "react-native-svg": "^12.1.1",
     "react-native-swipe-list-view": "^3.2.9",
+    "react-native-switch": "^2.0.0",
     "react-native-tags-input": "^1.0.10",
     "react-native-toast-message": "^1.6.0",
     "react-native-ui-lib": "^5.27.0",

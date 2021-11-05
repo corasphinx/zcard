@@ -21,6 +21,7 @@ import TwitterEmbedScreen from '../pages/EditCard/ZModules/TwitterEmbedScreen';
 import InstagramEmbedScreen from '../pages/EditCard/ZModules/InstagramEmbedScreen';
 import FacebookEmbedScreen from '../pages/EditCard/ZModules/FacebookEmbedScreen';
 import VideoEmbedScreen from '../pages/EditCard/ZModules/VideoEmbedScreen';
+import PDFEmbedScreen from '../pages/EditCard/ZModules/PDFEmbedScreen';
 import { colors, fonts } from '../styles';
 
 const headerLeftComponent = (props) => {
@@ -280,6 +281,18 @@ const StackNavigationData = [
     name: 'VideoEmbed',
     title: 'Video Embed',
     component: VideoEmbedScreen,
+    headerLeft: headerLeftComponent,
+    headerBackground: { source: headerBackground },
+    headerTitleStyle: {
+      fontFamily: fonts.primaryRegular,
+      color: colors.white,
+      fontSize: 18,
+    },
+  },
+  {
+    name: 'PDFEmbed',
+    title: 'PDF Embed',
+    component: PDFEmbedScreen,
     headerLeft: headerLeftComponent,
     headerBackground: { source: headerBackground },
     headerTitleStyle: {
