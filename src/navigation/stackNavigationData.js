@@ -11,6 +11,7 @@ import SectionEditScreen from '../pages/EditCard/SectionEditScreen';
 import CreateSectionScreen from '../pages/EditCard/CreateSectionScreen';
 import ZModuleScreen from '../pages/EditCard/ZModuleScreen';
 import LeadFormScreen from '../pages/EditCard/ZModules/LeadFormScreen';
+import YouTubeEmbedScreen from '../pages/EditCard/ZModules/YouTubeEmbedScreen';
 import { colors, fonts } from '../styles';
 
 const headerLeftComponent = (props) => {
@@ -150,6 +151,18 @@ const StackNavigationData = [
     name: 'LeadForm',
     title: 'Lead Form',
     component: LeadFormScreen,
+    headerLeft: headerLeftComponent,
+    headerBackground: { source: headerBackground },
+    headerTitleStyle: {
+      fontFamily: fonts.primaryRegular,
+      color: colors.white,
+      fontSize: 18,
+    },
+  },
+  {
+    name: 'YouTubeEmbed',
+    title: 'YouTube Embed',
+    component: YouTubeEmbedScreen,
     headerLeft: headerLeftComponent,
     headerBackground: { source: headerBackground },
     headerTitleStyle: {
