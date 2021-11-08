@@ -35,7 +35,11 @@ class FacebookEmbedScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sliderActiveSlide: 0
+      sliderActiveSlide: 0,
+      saving: false,
+      section_title: '',
+      tab_color: colors.default_module_tab_color,
+      tab_font_color: colors.default_module_tab_font_color,
     };
   }
 
@@ -94,6 +98,7 @@ class FacebookEmbedScreen extends Component {
     </Block>
   }
   renderScreen2 = (title, index) => {
+    const { saving, tab_color, tab_font_color } = this.state;
     return <Block style={[commonStyles.Card, { minHeight: height - 130 }]}>
       <Text h6 color={colors.primary}>{index + 1}. {title}</Text>
       <Block style={commonStyles.divider} />
@@ -109,10 +114,11 @@ class FacebookEmbedScreen extends Component {
           style={styles.label}
           size={16}>Section's Background color</Text>
         <Input
+          value={tab_color}
           style={styles.inputBox} color={colors.primary} fontSize={18}
           icon='round-brush' family='Entypo' iconSize={18} iconColor={colors.primary}
           onPressIn={() => this.props.navigation.navigate('ColorPicker', {
-            pickColor: (color) => console.info(color)
+            pickColor: (tab_color) => this.setState({ tab_color })
           })}
         />
       </Block>
@@ -121,10 +127,11 @@ class FacebookEmbedScreen extends Component {
           style={styles.label}
           size={16}>Section's Font Color</Text>
         <Input
+          value={tab_font_color}
           style={styles.inputBox} color={colors.primary} fontSize={18}
           icon='round-brush' family='Entypo' iconSize={18} iconColor={colors.primary}
           onPressIn={() => this.props.navigation.navigate('ColorPicker', {
-            pickColor: (color) => console.info(color)
+            pickColor: (tab_font_color) => this.setState({ tab_font_color })
           })}
         />
       </Block>
@@ -136,6 +143,8 @@ class FacebookEmbedScreen extends Component {
           color={colors.green}
           icon='save' iconFamily='AntDesign' iconSize={18}
           textStyle={{ fontSize: 18 }}
+          loading={saving}
+          onPress={this.save}
         > FINISH</Button>
       </Block>
     </Block>

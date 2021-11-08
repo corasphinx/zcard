@@ -44,7 +44,11 @@ class LeadFormScreen extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      sliderActiveSlide: 0
+      sliderActiveSlide: 0,
+      saving: false,
+      section_title: '',
+      tab_color: colors.default_module_tab_color,
+      tab_font_color: colors.default_module_tab_font_color,
     };
   }
 
