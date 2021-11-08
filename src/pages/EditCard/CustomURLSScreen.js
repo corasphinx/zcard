@@ -10,7 +10,7 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   ActivityIndicator,
-  TextInput
+  Platform
 } from 'react-native';
 
 import {

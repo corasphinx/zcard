@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { StyleSheet, Dimensions, SafeAreaView, KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, Dimensions, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
 import {
   Block,
   theme,

@@ -6,6 +6,7 @@ import {
   Dimensions,
   SafeAreaView,
   KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 
 import {

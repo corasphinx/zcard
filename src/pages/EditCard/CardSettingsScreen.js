@@ -9,7 +9,7 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   ScrollView,
-  ActivityIndicator,
+  Platform,
   TextInput
 } from 'react-native';
 

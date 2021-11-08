@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   ScrollView,
+  Platform
 } from 'react-native';
 
 import {
