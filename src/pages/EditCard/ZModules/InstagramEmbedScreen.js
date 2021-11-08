@@ -4,6 +4,7 @@ import { KeyboardAvoidingView, ScrollView, SafeAreaView, StyleSheet, Dimensions,
 
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { Block, Text, Input, Button, Checkbox, Radio } from 'galio-framework';
+import Toast from 'react-native-toast-message';
 import { colors, commonStyles } from '../../../styles';
 import { hostname } from '../../../constant';
 import {
@@ -38,6 +39,7 @@ class InstagramEmbedScreen extends Component {
       sliderActiveSlide: 0,
       saving: false,
       section_title: '',
+      url: '',
       tab_color: colors.default_module_tab_color,
       tab_font_color: colors.default_module_tab_font_color,
     };
@@ -54,7 +56,155 @@ class InstagramEmbedScreen extends Component {
     }
   }
 
+  isValidate = () => {
+    const { section_title, url } = this.state;
+    if (section_title == '') return 'You must supply a Zmodule Title to save!';
+    if (url == '') return 'You must supply a URL to save!';
+    return '';
+  }
+
+  save = () => {
+    this.setState({ saving: true });
+    const { selectedZCard } = this.props;
+    const { product } = this.props.route.params;
+    const { section_title, url, tab_color, tab_font_color } = this.state;
+
+    let validation = this.isValidate();
+    if (validation != '') {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        text1: 'Error',
+        text2: validation + ' 😥'
+      });
+      this.setState({ saving: false });
+      return;
+    }
+
+    // add zmodule
+    this.props.callController(
+      '/controllers/Zcard/add_zmodule_section.php',
+      {
+        zcard_id: selectedZCard.id,
+        product_id: product.id
+      },
+      (res) => {
+        let url = res.zmodule_wizard_url;
+        let params = url.split('/');
+        const identifier = params[4]; // string
+        const zcard = params[5];  // same as zcard_id
+        const section = params[6];
+        let page = params[7];
+
+        // save title
+        this.props.callController(
+          `/zmodule_files/${identifier}/controllers/${page}.php`,
+          {
+            section_title,
+            zcard,
+            section
+          },
+          (msg) => {
+            page++;
+            // save URL
+            this.props.callController(
+              `/zmodule_files/${identifier}/controllers/${page}.php`,
+              {
+                zcard: zcard,
+                section: section,
+                zmodule_identifier: identifier,
+                url: url
+              },
+              (msg) => {
+                page++;
+                // save Colors
+                this.props.callController(
+                  `/zmodule_files/GLOBAL-ZMODULE-FILES/controllers/section-colors.php`,
+                  {
+                    zmodule_identifier: identifier,
+                    zcard: zcard,
+                    section: section,
+                    tab_color: tab_color,
+                    tab_font_color: tab_font_color
+                  },
+                  (msg) => {
+                    // complete saving
+                    this.props.callController(
+                      '/zmodule_files/mark_section_complete.php',
+                      {
+                        section
+                      },
+                      (msg) => {
+                        this.setState({ saving: false });
+                        Toast.show({
+                          type: 'success',
+                          position: 'top',
+                          text1: 'Success',
+                          text2: msg + ' 🎊'
+                        });
+                        setTimeout(() => {
+                          this.props.navigation.pop(2);
+                        }, 2000);
+                      },
+                      (msg) => {
+                        this.setState({ saving: false });
+                        Toast.show({
+                          type: 'error',
+                          position: 'top',
+                          text1: 'Error',
+                          text2: msg + ' 😥'
+                        });
+                      },
+                    )
+                  },
+                  (msg) => {
+                    this.setState({ saving: false });
+                    Toast.show({
+                      type: 'error',
+                      position: 'top',
+                      text1: 'Error',
+                      text2: msg + ' 😥'
+                    });
+                  },
+                )
+              },
+              (msg) => {
+                this.setState({ saving: false });
+                Toast.show({
+                  type: 'error',
+                  position: 'top',
+                  text1: 'Error',
+                  text2: msg + ' 😥'
+                });
+              },
+            );
+          },
+          (msg) => {
+            this.setState({ saving: false });
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              text1: 'Error',
+              text2: msg + ' 😥'
+            });
+          },
+        )
+      },
+      (msg) => {
+        this.setState({ saving: false });
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Error',
+          text2: msg + ' 😥'
+        });
+      },
+      true
+    )
+  }
+
   renderScreen0 = (title, index) => {
+    const { section_title } = this.state;
     return <Block style={[commonStyles.Card, { minHeight: height - 130 }]}>
       <Text h6 color={colors.primary}>{index + 1}. {title}</Text>
       <Block style={commonStyles.divider} />
@@ -69,13 +219,16 @@ class InstagramEmbedScreen extends Component {
           style={styles.label}
           size={16}>ZModule Title</Text>
         <Input
+          value={section_title}
           style={styles.inputBox} color={colors.primary} fontSize={18}
           icon='infocirlceo' family='AntDesign' iconSize={18} iconColor={colors.primary}
+          onChangeText={(section_title) => this.setState({ section_title })}
         />
       </Block>
     </Block>
   }
   renderScreen1 = (title, index) => {
+    const { url } = this.state;
     return <Block style={[commonStyles.Card, { minHeight: height - 130 }]}>
       <Text h6 color={colors.primary}>{index + 1}. {title}</Text>
       <Block style={commonStyles.divider} />
@@ -91,8 +244,10 @@ class InstagramEmbedScreen extends Component {
           style={styles.label}
           size={16}>Instagram Embed URL</Text>
         <Input
+          value={url}
           style={styles.inputBox} color={colors.primary} fontSize={18}
           icon='instagram' family='AntDesign' iconSize={18} iconColor={colors.primary}
+          onChangeText={(url) => this.setState({ url })}
         />
       </Block>
     </Block>
@@ -193,6 +348,7 @@ class InstagramEmbedScreen extends Component {
             />
             {/* </Block> */}
           </Block>
+          <Toast ref={(ref) => Toast.setRef(ref)} />
         </SafeAreaView>
       </KeyboardAvoidingView>
     );
@@ -207,7 +363,7 @@ function mapStateToProps(state) {
 }
 function mapDispatchToProps(dispatch) {
   return {
-    fetchProduct: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
+    callController: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
   };
 }
 export default connect(
