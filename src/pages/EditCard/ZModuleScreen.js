@@ -49,7 +49,7 @@ class ZModuleScreen extends React.Component {
         if (productIds)
           productIds.map(id =>
             this.props.fetchProduct(
-              '/Chatter/App/fetchProduct.php',
+              '/controllers/Chatter/App/fetchProduct.php',
               { id },
               (product) => {
                 if (product.valid)

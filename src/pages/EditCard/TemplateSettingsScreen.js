@@ -86,7 +86,7 @@ class TemplateSettingsScreen extends React.Component {
     if (selectedTemplateID) {
       this.setState({ saving: true });
       this.props.save_use_template_id(
-        '/edit-zcard/save_use_template_id.php',
+        '/controllers/edit-zcard/save_use_template_id.php',
         {
           zcard_id: selectedZCard.id,
           template_id: selectedTemplateID
@@ -118,7 +118,7 @@ class TemplateSettingsScreen extends React.Component {
 
     this.setState({ deleting: true, isDeleteModal: false });
     this.props.deleteCard(
-      '/Zcard/delete-zcard.php',
+      '/controllers/Zcard/delete-zcard.php',
       {
         zcard_id: selectedZCard.id
       },

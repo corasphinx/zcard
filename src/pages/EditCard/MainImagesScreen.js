@@ -304,7 +304,7 @@ class MainImagesScreen extends React.Component {
     }
 
     this.props.saveTab(
-      `/edit-zcard/update_main_photos.php?zcard_id=${selectedZCard.id}`,
+      `/controllers/edit-zcard/update_main_photos.php?zcard_id=${selectedZCard.id}`,
       data,
       (msg) => {
         this.setState({ saving: false });

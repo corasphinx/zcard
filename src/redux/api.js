@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { hostname, requestGate } from '../constant';
 const Client = axios.create({
-    baseURL: hostname + requestGate,
+    baseURL: hostname,
     headers: {
         Accept: 'application/x-www-form-urlencoded',
         withCredentials: true

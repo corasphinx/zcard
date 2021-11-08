@@ -52,7 +52,7 @@ class PickerScreen extends React.Component {
   setColor = (value) => {
     if (this.props.route.params && this.props.route.params.pickColor) {
       // for LabelsScreen
-      this.props.route.params.pickColor(value);
+      this.props.route.params.pickColor(value.toUpperCase());
       this.props.navigation.goBack();
     }
   }

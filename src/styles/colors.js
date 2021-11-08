@@ -19,6 +19,8 @@ const blueVersion = {
   header: '#5a8dee',
   original_tab_color:'#8395a7',
   original_tab_font_color:'#000000',
+  default_module_tab_color:'#273C56',
+  default_module_tab_font_color:'#FFFFFF',
 };
 
 export default blueVersion;

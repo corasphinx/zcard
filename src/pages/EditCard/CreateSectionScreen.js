@@ -102,7 +102,7 @@ class CreateSectionScreen extends React.Component {
     } = this.state;
     this.setState({ creatingTextSection: true });
     this.props.updateSection(
-      `/edit-zcard/update_any_section.php?z=${selectedZCard.id}&s=0&t=text`,
+      `/controllers/edit-zcard/update_any_section.php?z=${selectedZCard.id}&s=0&t=text`,
       {
         section_name: text_sectionTitle,
         section_html: text_sectionDescription,
@@ -141,7 +141,7 @@ class CreateSectionScreen extends React.Component {
       video_originTabFontColor
     } = this.state;
     this.props.updateSection(
-      `/edit-zcard/update_any_section.php?z=${selectedZCard.id}&s=0&t=video`,
+      `/controllers/edit-zcard/update_any_section.php?z=${selectedZCard.id}&s=0&t=video`,
       {
         section_name: video_sectionTitle,
         video_url: video_url,
@@ -181,7 +181,7 @@ class CreateSectionScreen extends React.Component {
       image_originTabFontColor
     } = this.state;
     this.props.updateSection(
-      `/edit-zcard/update_any_section.php?z=${selectedZCard.id}&s=0&t=image`,
+      `/controllers/edit-zcard/update_any_section.php?z=${selectedZCard.id}&s=0&t=image`,
       {
         image_name: image_sectionTitle,
         image_url: image_url,
@@ -220,7 +220,7 @@ class CreateSectionScreen extends React.Component {
       pdf_originTabFontColor
     } = this.state;
     this.props.updateSection(
-      `/edit-zcard/update_any_section.php?z=${selectedZCard.id}&s=0&t=pdf`,
+      `/controllers/edit-zcard/update_any_section.php?z=${selectedZCard.id}&s=0&t=pdf`,
       {
         section_name: pdf_sectionTitle,
         pdf_url: pdf_url,
@@ -258,7 +258,7 @@ class CreateSectionScreen extends React.Component {
       html_originTabFontColor
     } = this.state;
     this.props.updateSection(
-      `/edit-zcard/update_any_section.php?z=${selectedZCard.id}&s=0&t=default`,
+      `/controllers/edit-zcard/update_any_section.php?z=${selectedZCard.id}&s=0&t=default`,
       {
         section_name: html_sectionTitle,
         section_html: html_sectionDescription,
@@ -296,7 +296,7 @@ class CreateSectionScreen extends React.Component {
       facebook_originTabFontColor
     } = this.state;
     this.props.updateSection(
-      `/edit-zcard/update_any_section.php?z=${selectedZCard.id}&s=0&t=facebook_embed`,
+      `/controllers/edit-zcard/update_any_section.php?z=${selectedZCard.id}&s=0&t=facebook_embed`,
       {
         section_name: facebook_sectionTitle,
         general_value: facebook_url,

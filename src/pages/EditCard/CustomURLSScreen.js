@@ -107,7 +107,7 @@ class CustomURLSScreen extends React.Component {
       });
     };
     this.props.update_icons(
-      `edit-zcard/update_icons.php?zcard_id=${selectedZCard.id}`,
+      `/controllers/edit-zcard/update_icons.php?zcard_id=${selectedZCard.id}`,
       {
         icons: JSON.stringify(icons)
       },
@@ -136,7 +136,7 @@ class CustomURLSScreen extends React.Component {
     const { selectedZCard } = this.props;
     this.setState({ removing: true });
     this.props.remove_all_icons(
-      '/edit-zcard/remove_all_icons.php',
+      '/controllers/edit-zcard/remove_all_icons.php',
       {
         zcard_id: selectedZCard.id
       },

@@ -95,7 +95,7 @@ class SectionEditScreen extends React.Component {
       sectionsIDs.push(currentSections[i].id);
 
     this.props.update_section_order(
-      '/edit-zcard/update_section_order.php',
+      '/controllers/edit-zcard/update_section_order.php',
       {
         zcard_id: selectedZCard.id,
         sections: JSON.stringify(sectionsIDs)

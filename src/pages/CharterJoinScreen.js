@@ -83,7 +83,7 @@ class CharterJoinScreen extends React.Component {
         if (zbuck_pack_ids)
           zbuck_pack_ids.map(id =>
             this.props.fetchProductData(
-              '/Chatter/App/fetchProduct.php',
+              '/controllers/Chatter/App/fetchProduct.php',
               { id },
               (ProductData) => this.setState({
                 ProductDatas: [...this.state.ProductDatas,
@@ -132,7 +132,7 @@ class CharterJoinScreen extends React.Component {
     const { CharterProductData } = this.props.route.params;
     this.setState({ makePaymenting: true });
     this.props.makePayment(
-      '/Charter/pay_new_membership_zbucks.php',
+      '/controllers/Charter/pay_new_membership_zbucks.php',
       { id: CharterProductData.id },
       (data) => {
         this.setState({ makePaymenting: false });

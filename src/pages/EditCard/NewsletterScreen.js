@@ -106,7 +106,7 @@ class NewsletterScreen extends React.Component {
     const { newsletter_section_text } = this.state;
     this.setState({ saving: true });
     this.props.update_newsletter_section(
-      `/Zcard/update_newsletter_section.php?zcard_id=${selectedZCard.id}`,
+      `/controllers/Zcard/update_newsletter_section.php?zcard_id=${selectedZCard.id}`,
       {
         title: newsletter_section_text
       },

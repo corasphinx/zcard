@@ -84,7 +84,7 @@ class HomeScreen extends React.Component {
         if (zcardIds && zcardIds.length)
           zcardIds.map(zcard_id => {
             this.props.fetchZCardEntry(
-              '/Chatter/App/fetchZCard.php',
+              '/controllers/Chatter/App/fetchZCard.php',
               { zcard_id },
               (zcard) => {
                 if (zcard.expiration_date != null) {
@@ -96,7 +96,7 @@ class HomeScreen extends React.Component {
                   zcard.expiration_date = 'No expiration date.';
                 };
                 this.props.fetchProduct(
-                  'Chatter/App/fetchProduct.php',
+                  '/controllers/Chatter/App/fetchProduct.php',
                   { id: zcard.product_id },
                   (ProductInfo) => {
                     zcard.ProductInfo = ProductInfo;
@@ -266,7 +266,7 @@ class HomeScreen extends React.Component {
     this.setState({ isDeleteModal: false });
 
     this.props.deleteCard(
-      '/Zcard/delete-zcard.php',
+      '/controllers/Zcard/delete-zcard.php',
       {
         zcard_id: selected_zcard_id
       },

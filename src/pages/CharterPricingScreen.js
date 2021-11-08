@@ -42,7 +42,7 @@ class CharterPricingScreen extends React.Component {
 
   initData = () => {
     this.props.fetchDeluxeZcardProduct(
-      '/Chatter/App/fetchProduct.php',
+      '/controllers/Chatter/App/fetchProduct.php',
       { id: 93 },
       (DeluxeZcardProduct) => {
         this.setState({ DeluxeZcardProduct });
@@ -66,7 +66,7 @@ class CharterPricingScreen extends React.Component {
         if (charter_product_ids)
           charter_product_ids.map(id => {
             this.props.fetchDeluxeZcardProduct(
-              '/Chatter/App/fetchProduct.php',
+              '/controllers/Chatter/App/fetchProduct.php',
               { id: id },
               (product) => {
                 this.setState({ charter_product_datas: [...this.state.charter_product_datas, product] });

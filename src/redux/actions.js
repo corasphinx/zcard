@@ -55,7 +55,7 @@ export function CallController(controller, req, successcb, errorcb, getData = fa
 }
 
 export function CallClassFunction(className, funcName, reqArray, successcb, errorcb) {
-    Client.post(`/Chatter/App/call_class_function.php`,
+    Client.post(`/controllers/Chatter/App/call_class_function.php`,
         convertParams({
             class: className,
             func: funcName,
@@ -75,7 +75,7 @@ export function CallClassFunction(className, funcName, reqArray, successcb, erro
 }
 
 export function CallZCardClassFunction(id, funcName, reqArray, successcb, errorcb) {
-    Client.post(`/App/call_zcard_class_function.php`,
+    Client.post(`/controllers/App/call_zcard_class_function.php`,
         convertParams({
             id: id,
             func: funcName,
@@ -95,7 +95,7 @@ export function CallZCardClassFunction(id, funcName, reqArray, successcb, errorc
 }
 
 export function SignIn(dispatch, req, successcb, errorcb) {
-    Client.post(`/Login/login.php`, convertParams(req))
+    Client.post(`/controllers/Login/login.php`, convertParams(req))
         .then(res => {
             if (res.data.success) {
                 SetCurrentUser(dispatch, res.data.data.Account);
@@ -111,7 +111,7 @@ export function SignIn(dispatch, req, successcb, errorcb) {
 }
 
 export function SignOut() {
-    Client.post(`/Login/logout.php`)
+    Client.post(`/controllers/Login/logout.php`)
         .then(res => {
         })
         .catch(error => {
@@ -153,7 +153,7 @@ export function ClearPassword(controller, successcb, errorcb) {
         });
 }
 export function GetAllSectionEditHTML(dispatch, id, funcName, reqArray, successcb, errorcb) {
-    Client.post(`/App/call_zcard_class_function.php`,
+    Client.post(`/controllers/App/call_zcard_class_function.php`,
         convertParams({
             id: id,
             func: funcName,
@@ -173,7 +173,7 @@ export function GetAllSectionEditHTML(dispatch, id, funcName, reqArray, successc
         });
 }
 export function FetchAddSectionPermission(dispatch, id, funcName, reqArray, successcb, errorcb) {
-    Client.post(`/App/call_zcard_class_function.php`,
+    Client.post(`/controllers/App/call_zcard_class_function.php`,
         convertParams({
             id: id,
             func: funcName,
