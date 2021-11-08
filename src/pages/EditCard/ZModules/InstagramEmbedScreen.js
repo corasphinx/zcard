@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { KeyboardAvoidingView, ScrollView, SafeAreaView, StyleSheet, Dimensions, Platform, Image } from 'react-native';
 
 import Carousel, { Pagination } from 'react-native-snap-carousel';
-import { Block, Text, Input, Button, Checkbox, Radio } from 'galio-framework';
+import { Block, Text, Input, Button } from 'galio-framework';
 import Toast from 'react-native-toast-message';
 import { colors, commonStyles } from '../../../styles';
 import { hostname } from '../../../constant';
@@ -89,8 +89,7 @@ class InstagramEmbedScreen extends Component {
         product_id: product.id
       },
       (res) => {
-        let url = res.zmodule_wizard_url;
-        let params = url.split('/');
+        let params = res.zmodule_wizard_url.split('/');
         const identifier = params[4]; // string
         const zcard = params[5];  // same as zcard_id
         const section = params[6];
