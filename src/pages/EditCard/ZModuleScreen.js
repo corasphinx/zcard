@@ -110,7 +110,7 @@ class ZModuleScreen extends React.Component {
                   ZMarketSection
                   BusinessSearchModule
                   ShortURL  // incompleted  X
-                  EmbedSection  // HTML Editor
+                  EmbedSection  // HTML Editor  [-_-]"
                   TwitterEmbed
                   InstagramEmbed
                   Ztext // skipped  X
