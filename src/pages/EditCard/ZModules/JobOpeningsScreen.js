@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { KeyboardAvoidingView, ScrollView, SafeAreaView, StyleSheet, Dimensions, Platform, Image, TextInput } from 'react-native';
+import { KeyboardAvoidingView, ScrollView, SafeAreaView, StyleSheet, Dimensions, Platform, Image, TextInput, TouchableOpacity } from 'react-native';
 
 import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { Block, Text, Input, Button, Checkbox, Radio } from 'galio-framework';
-import DocumentPicker from 'react-native-document-picker';
-import { Switch } from 'react-native-switch';
+import Toast from 'react-native-toast-message';
 import { colors, commonStyles } from '../../../styles';
 import { hostname } from '../../../constant';
+import MyPagination from '../../../components/Pagination';
 import {
   CallController
 } from '../../../redux/actions';
@@ -17,7 +17,7 @@ function wp(percentage) {
   const value = (percentage * width) / 100;
   return Math.round(value);
 }
-
+const PAGE_SIZE = 3;
 const ENTRIES = [
   {
     index: 0,
@@ -40,9 +40,13 @@ class JobOpeningsScreen extends Component {
       sliderActiveSlide: 0,
       saving: false,
       section_title: '',
+      selectedGroup: null,
       tab_color: colors.default_module_tab_color,
       tab_font_color: colors.default_module_tab_font_color,
-      embedType: true
+      ZGroups: [],
+      pageLength: 0,
+      searchText: '',
+      searching: false,
     };
   }
 
@@ -57,7 +61,209 @@ class JobOpeningsScreen extends Component {
     }
   }
 
+  isValidate = () => {
+    const { section_title, selectedGroup } = this.state;
+    if (section_title == '') return 'You must supply a Zmodule Title to save!';
+    if (selectedGroup == null) return 'You must select a ZGroup to save!';
+    return '';
+  }
+
+  save = () => {
+    this.setState({ saving: true });
+    const { selectedZCard } = this.props;
+    const { product } = this.props.route.params;
+    const { section_title, selectedGroup, tab_color, tab_font_color } = this.state;
+
+    let validation = this.isValidate();
+    if (validation != '') {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        text1: 'Error',
+        text2: validation + ' 😥'
+      });
+      this.setState({ saving: false });
+      return;
+    }
+
+    // add zmodule
+    this.props.callController(
+      '/controllers/Zcard/add_zmodule_section.php',
+      {
+        zcard_id: selectedZCard.id,
+        product_id: product.id
+      },
+      (res) => {
+        let url = res.zmodule_wizard_url;
+        let params = url.split('/');
+        const identifier = params[4]; // string
+        const zcard = params[5];  // same as zcard_id
+        const section = params[6];
+        let page = params[7];
+
+        // save title
+        this.props.callController(
+          `/zmodule_files/${identifier}/controllers/${page}.php`,
+          {
+            section_title,
+            zcard,
+            section
+          },
+          (msg) => {
+            page++;
+            // save Group
+            this.props.callController(
+              `/zmodule_files/${identifier}/controllers/${page}.php`,
+              {
+                zcard: zcard,
+                section: section,
+                zmodule_identifier: identifier,
+                group_id: selectedGroup.id
+              },
+              (msg) => {
+                page++;
+                // save Colors
+                this.props.callController(
+                  `/zmodule_files/GLOBAL-ZMODULE-FILES/controllers/section-colors.php`,
+                  {
+                    zmodule_identifier: identifier,
+                    zcard: zcard,
+                    section: section,
+                    tab_color: tab_color,
+                    tab_font_color: tab_font_color
+                  },
+                  (msg) => {
+                    // complete saving
+                    this.props.callController(
+                      '/zmodule_files/mark_section_complete.php',
+                      {
+                        section
+                      },
+                      (msg) => {
+                        this.setState({ saving: false });
+                        Toast.show({
+                          type: 'success',
+                          position: 'top',
+                          text1: 'Success',
+                          text2: msg + ' 🎊'
+                        });
+                        setTimeout(() => {
+                          this.props.navigation.pop(2);
+                        }, 2000);
+                      },
+                      (msg) => {
+                        this.setState({ saving: false });
+                        Toast.show({
+                          type: 'error',
+                          position: 'top',
+                          text1: 'Error',
+                          text2: msg + ' 😥'
+                        });
+                      },
+                    )
+                  },
+                  (msg) => {
+                    this.setState({ saving: false });
+                    Toast.show({
+                      type: 'error',
+                      position: 'top',
+                      text1: 'Error',
+                      text2: msg + ' 😥'
+                    });
+                  },
+                )
+              },
+              (msg) => {
+                this.setState({ saving: false });
+                Toast.show({
+                  type: 'error',
+                  position: 'top',
+                  text1: 'Error',
+                  text2: msg + ' 😥'
+                });
+              },
+            );
+          },
+          (msg) => {
+            this.setState({ saving: false });
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              text1: 'Error',
+              text2: msg + ' 😥'
+            });
+          },
+        )
+      },
+      (msg) => {
+        this.setState({ saving: false });
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Error',
+          text2: msg + ' 😥'
+        });
+      },
+      true
+    )
+  }
+
+  search_zgroups = (searchText, offset) => {
+    this.setState({ searching: true });
+    if (searchText == '') {
+      this.setState({
+        ZGroups: [],
+        pageLength: 0,
+        searching: false,
+        selectedGroup: null
+      });
+    } else {
+      this.props.callController(
+        '/controllers/Search/search_zgroups.php',
+        {
+          search_text: searchText,
+          offset: offset,
+          limit: 3,
+          pagination: true,
+        },
+        (data) => {
+          this.setState({
+            ZGroups: data.results,
+            pageLength: Math.ceil(data.total_count / PAGE_SIZE),
+            searching: false
+          });
+        },
+        (msg) => {
+          this.setState({ searching: false });
+          Toast.show({
+            type: 'error',
+            position: 'top',
+            text1: 'Error',
+            text2: 'No result 😥'
+          });
+        },
+        true
+      );
+    }
+  }
+  renderZGroups = () => {
+    const { ZGroups } = this.state;
+    if (ZGroups.length == 0) return;
+    return ZGroups.map(ZGroup => <TouchableOpacity onPress={() => this.setState({ selectedGroup: ZGroup })} key={ZGroup.id}>
+      <Block style={[commonStyles.Card, { marginBottom: 10 }]}>
+        <Text bold size={18} color={colors.primary}>{ZGroup.gname}</Text>
+        {ZGroup.image_src && <Image
+          style={styles.image}
+          source={{ uri: hostname + ZGroup.image_src }}
+        />}
+        <Text italic size={16} color={colors.primaryLight} style={{ flexShrink: 1 }}>{ZGroup.gdescription}</Text>
+      </Block>
+    </TouchableOpacity>
+    )
+  }
+
   renderScreen0 = (title, index) => {
+    const { section_title } = this.state;
     return <Block style={[commonStyles.Card, { minHeight: height - 130 }]}>
       <Text h6 color={colors.primary}>{index + 1}. {title}</Text>
       <Block style={commonStyles.divider} />
@@ -72,14 +278,16 @@ class JobOpeningsScreen extends Component {
           style={styles.label}
           size={16}>ZModule Title</Text>
         <Input
+          value={section_title}
           style={styles.inputBox} color={colors.primary} fontSize={18}
           icon='infocirlceo' family='AntDesign' iconSize={18} iconColor={colors.primary}
+          onChangeText={(section_title) => this.setState({ section_title })}
         />
       </Block>
     </Block>
   }
   renderScreen1 = (title, index) => {
-    const { embedType } = this.state;
+    const { pageLength, searchText, searching, selectedGroup } = this.state;
     return <Block style={[commonStyles.Card, { minHeight: height - 130 }]}>
       <Text h6 color={colors.primary}>{index + 1}. {title}</Text>
       <Block style={commonStyles.divider} />
@@ -91,9 +299,12 @@ class JobOpeningsScreen extends Component {
       </Block>
       <Block style={commonStyles.divider} />
       <Block style={{ margin: 10 }}>
-        <Text
+        {selectedGroup == null && <Text
           style={styles.label}
-          size={16}>Select Group</Text>
+          size={16}>Select Group</Text>}
+        {selectedGroup != null && <Text
+          style={[styles.label, { color: colors.primary }]}
+          size={16}>Selected: {selectedGroup.gname}</Text>}
         <Block row>
           <Input
             placeholder='Search...'
@@ -111,8 +322,17 @@ class JobOpeningsScreen extends Component {
             color={colors.green}
             textStyle={{ fontSize: 18 }}
             style={{ width: wp(20) }}
+            loading={searching}
+            onPress={() => this.search_zgroups(searchText, 0)}
           > Search</Button>
         </Block>
+        {this.renderZGroups()}
+        {pageLength > 0 && <MyPagination
+          width={wp(80)}
+          length={pageLength}
+          onScrollTo={(selectedPage) => { this.search_zgroups(searchText, selectedPage) }}
+        />
+        }
       </Block>
     </Block>
   }
@@ -212,6 +432,7 @@ class JobOpeningsScreen extends Component {
             />
             {/* </Block> */}
           </Block>
+          <Toast ref={(ref) => Toast.setRef(ref)} />
         </SafeAreaView>
       </KeyboardAvoidingView>
     );
@@ -226,7 +447,7 @@ function mapStateToProps(state) {
 }
 function mapDispatchToProps(dispatch) {
   return {
-    fetchProduct: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
+    callController: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
   };
 }
 export default connect(
@@ -269,4 +490,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.backgroundLight,
     color: colors.primary,
   },
+  image: {
+    width: wp(70),
+    height: wp(40),
+    resizeMode: 'stretch',
+    alignSelf: 'center'
+  }
 });

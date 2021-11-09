@@ -342,7 +342,7 @@ class HomeScreen extends React.Component {
               <Block row>
                 <TouchableOpacity onPress={() => this.editZcard(data.item)}>
                   <Block style={{ height: '100%', width: 75, backgroundColor: 'green', alignItems: 'center', justifyContent: 'center' }}>
-                    <Icon name="trash" family="entypo" color={colors.white} size={15} />
+                    <Icon name="edit" family="entypo" color={colors.white} size={15} />
                     <Text size={15} color={colors.white}>Edit</Text>
                   </Block>
                 </TouchableOpacity>
