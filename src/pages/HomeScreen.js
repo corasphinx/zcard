@@ -63,12 +63,12 @@ class HomeScreen extends React.Component {
     })
     this.initData();
     gRefresh = false;
-    Toast.show({
-      type: 'info',
-      position: 'top',
-      text1: 'Information',
-      text2: 'You have cards that are expiring soon below. Simply click "Renew" on the card you need to renew to either renew your existing card, or upgrade to a different card product 😊'
-    });
+    // Toast.show({
+    //   type: 'info',
+    //   position: 'top',
+    //   text1: 'Information',
+    //   text2: 'You have cards that are expiring soon below. Simply click "Renew" on the card you need to renew to either renew your existing card, or upgrade to a different card product 😊'
+    // });
   }
 
   initData = () => {
@@ -81,6 +81,12 @@ class HomeScreen extends React.Component {
       'GetUserZCards',
       [currentUser.id],
       (zcardIds) => {
+        Toast.show({
+          type: 'info',
+          position: 'top',
+          text1: 'Information',
+          text2: 'Please swipe to edit any ZCard. 😊'
+        });
         if (zcardIds && zcardIds.length)
           zcardIds.map(zcard_id => {
             this.props.fetchZCardEntry(
