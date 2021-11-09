@@ -6,10 +6,12 @@ import Carousel, { Pagination } from 'react-native-snap-carousel';
 import { Block, Text, Input, Button, Checkbox, Radio } from 'galio-framework';
 import DocumentPicker from 'react-native-document-picker';
 import { Switch } from 'react-native-switch';
+import Toast from 'react-native-toast-message';
 import { colors, commonStyles } from '../../../styles';
 import { hostname } from '../../../constant';
 import {
-  CallController
+  CallController,
+  SaveTab
 } from '../../../redux/actions';
 const { width, height } = Dimensions.get('window');
 
@@ -44,6 +46,10 @@ class ImageSectionScreen extends Component {
       sliderActiveSlide: 0,
       saving: false,
       section_title: '',
+      image_label: '',
+      image_file_upload: null,
+      image_url: '',
+      section_content: '',
       tab_color: colors.default_module_tab_color,
       tab_font_color: colors.default_module_tab_font_color,
       embedType: true
@@ -55,7 +61,7 @@ class ImageSectionScreen extends Component {
       const res = await DocumentPicker.pick({
         type: [DocumentPicker.types.images],
       });
-      // this.setState({ pdfFile: Array.isArray(res) ? res[0] : res });
+      this.setState({ image_file_upload: Array.isArray(res) ? res[0] : res });
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         // alert('Canceled');
@@ -79,7 +85,181 @@ class ImageSectionScreen extends Component {
     }
   }
 
+  isValidate = () => {
+    const { section_title, image_label, section_content } = this.state;
+    if (section_title == '') return 'You must supply a Zmodule Title to save!';
+    if (image_label == '') return 'You must supply a Label to save!';
+    if (section_content == '') return 'You must supply a Description to save!';
+    return '';
+  }
+
+  save = () => {
+    this.setState({ saving: true });
+    const { selectedZCard } = this.props;
+    const { product } = this.props.route.params;
+    const { section_title, image_label, image_file_upload, image_url, section_content, tab_color, tab_font_color } = this.state;
+
+    let validation = this.isValidate();
+    if (validation != '') {
+      Toast.show({
+        type: 'error',
+        position: 'top',
+        text1: 'Error',
+        text2: validation + ' 😥'
+      });
+      this.setState({ saving: false });
+      return;
+    }
+
+    // add zmodule
+    this.props.callController(
+      '/controllers/Zcard/add_zmodule_section.php',
+      {
+        zcard_id: selectedZCard.id,
+        product_id: product.id
+      },
+      (res) => {
+        let url = res.zmodule_wizard_url;
+        let params = url.split('/');
+        const identifier = params[4]; // string
+        const zcard = params[5];  // same as zcard_id
+        const section = params[6];
+        let page = params[7];
+
+        // save title
+        this.props.callController(
+          `/zmodule_files/${identifier}/controllers/${page}.php`,
+          {
+            section_title,
+            zcard,
+            section
+          },
+          (msg) => {
+            page++;
+            // save label & url
+            const fd = new FormData();
+            fd.append('zcard', zcard);
+            fd.append('section', section);
+            fd.append('image_label', image_label);
+            fd.append('image_url', image_url);
+            if (image_file_upload)
+              fd.append('image_file_upload', image_file_upload);
+
+            this.props.saveImage(
+              `/zmodule_files/${identifier}/controllers/${page}.php`,
+              fd,
+              (msg) => {
+                page++;
+
+                // save content
+                this.props.callController(
+                  `/zmodule_files/${identifier}/controllers/${page}.php`,
+                  {
+                    section_content,
+                    section,
+                    zcard
+                  },
+                  (msg) => {
+                    page++;
+                    // save Colors
+                    this.props.callController(
+                      `/zmodule_files/GLOBAL-ZMODULE-FILES/controllers/section-colors.php`,
+                      {
+                        zmodule_identifier: identifier,
+                        zcard: zcard,
+                        section: section,
+                        tab_color: tab_color,
+                        tab_font_color: tab_font_color
+                      },
+                      (msg) => {
+                        // complete saving
+                        this.props.callController(
+                          '/zmodule_files/mark_section_complete.php',
+                          {
+                            section
+                          },
+                          (msg) => {
+                            this.setState({ saving: false });
+                            Toast.show({
+                              type: 'success',
+                              position: 'top',
+                              text1: 'Success',
+                              text2: msg + ' 🎊'
+                            });
+                            setTimeout(() => {
+                              this.props.navigation.pop(2);
+                            }, 2000);
+                          },
+                          (msg) => {
+                            this.setState({ saving: false });
+                            Toast.show({
+                              type: 'error',
+                              position: 'top',
+                              text1: 'Error',
+                              text2: msg + ' 😥'
+                            });
+                          },
+                        )
+                      },
+                      (msg) => {
+                        this.setState({ saving: false });
+                        Toast.show({
+                          type: 'error',
+                          position: 'top',
+                          text1: 'Error',
+                          text2: msg + ' 😥'
+                        });
+                      },
+                    )
+                  },
+                  (msg) => {
+                    this.setState({ saving: false });
+                    Toast.show({
+                      type: 'error',
+                      position: 'top',
+                      text1: 'Error',
+                      text2: msg + ' 😥'
+                    });
+                  }
+                );
+              },
+              (msg) => {
+                this.setState({ saving: false });
+                Toast.show({
+                  type: 'error',
+                  position: 'top',
+                  text1: 'Error',
+                  text2: msg + ' 😥'
+                });
+              },
+            );
+          },
+          (msg) => {
+            this.setState({ saving: false });
+            Toast.show({
+              type: 'error',
+              position: 'top',
+              text1: 'Error',
+              text2: msg + ' 😥'
+            });
+          },
+        )
+      },
+      (msg) => {
+        this.setState({ saving: false });
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Error',
+          text2: msg + ' 😥'
+        });
+      },
+      true
+    )
+  }
+
   renderScreen0 = (title, index) => {
+    const { section_title } = this.state;
     return <Block style={[commonStyles.Card, { minHeight: height - 130 }]}>
       <Text h6 color={colors.primary}>{index + 1}. {title}</Text>
       <Block style={commonStyles.divider} />
@@ -94,14 +274,16 @@ class ImageSectionScreen extends Component {
           style={styles.label}
           size={16}>ZModule Title</Text>
         <Input
+          value={section_title}
           style={styles.inputBox} color={colors.primary} fontSize={18}
           icon='infocirlceo' family='AntDesign' iconSize={18} iconColor={colors.primary}
+          onChangeText={(section_title) => this.setState({ section_title })}
         />
       </Block>
     </Block>
   }
   renderScreen1 = (title, index) => {
-    const { embedType } = this.state;
+    const { embedType, image_label, image_file_upload, image_url } = this.state;
     return <Block style={[commonStyles.Card, { minHeight: height - 130 }]}>
       <Text h6 color={colors.primary}>{index + 1}. {title}</Text>
       <Block style={commonStyles.divider} />
@@ -117,8 +299,10 @@ class ImageSectionScreen extends Component {
           style={styles.label}
           size={16}>Image Label</Text>
         <Input
+          value={image_label}
           style={styles.inputBox} color={colors.primary} fontSize={18}
           icon='image' family='Entypo' iconSize={18} iconColor={colors.primary}
+          onChangeText={(image_label) => this.setState({ image_label })}
         />
       </Block>
       <Block style={{ margin: 10 }}>
@@ -145,6 +329,7 @@ class ImageSectionScreen extends Component {
             style={styles.label}
             size={16}>Choose a PDF from your device</Text>
           <Input
+            value={image_file_upload ? image_file_upload.uri : ''}
             style={styles.inputBox} color={colors.primary} fontSize={18}
             icon='clouduploado' family='AntDesign' iconSize={18} iconColor={colors.primary}
             help="Upload an image from your computer to attach any photo to your Zcard."
@@ -157,16 +342,19 @@ class ImageSectionScreen extends Component {
             style={styles.label}
             size={16}>Input PDF URL</Text>
           <Input
+            value={image_url}
             style={styles.inputBox} color={colors.primary} fontSize={18}
             icon='earth' family='AntDesign' iconSize={18} iconColor={colors.primary}
             help="You can use the field below to use a web URL for a photo already on the internet. This is a great way to use our Media Center and share images across the web."
             bottomHelp
+            onChangeText={(image_url) => this.setState({ image_url })}
           />
         </Block>}
       </Block>
     </Block>
   }
   renderScreen2 = (title, index) => {
+    const { section_content } = this.state;
     return <Block style={[commonStyles.Card, { minHeight: height - 130 }]}>
       <Text h6 color={colors.primary}>{index + 1}. {title}</Text>
       <Block style={commonStyles.divider} />
@@ -185,8 +373,8 @@ class ImageSectionScreen extends Component {
           multiline
           numberOfLines={3}
           placeholder='Input caption...'
-          onChangeText={(text_sectionDescription) => console.info(text_sectionDescription)}
-          style={styles.description}>
+          onChangeText={(section_content) => this.setState({ section_content })}
+          style={styles.description}>{section_content}
         </TextInput>
       </Block>
     </Block>
@@ -287,6 +475,7 @@ class ImageSectionScreen extends Component {
             />
             {/* </Block> */}
           </Block>
+          <Toast ref={(ref) => Toast.setRef(ref)} />
         </SafeAreaView>
       </KeyboardAvoidingView>
     );
@@ -301,7 +490,8 @@ function mapStateToProps(state) {
 }
 function mapDispatchToProps(dispatch) {
   return {
-    fetchProduct: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
+    callController: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
+    saveImage: (controller, req, successcb, errorcb) => SaveTab(controller, req, successcb, errorcb),
   };
 }
 export default connect(
