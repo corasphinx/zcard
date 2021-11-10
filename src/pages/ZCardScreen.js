@@ -12,6 +12,7 @@ import {
 } from 'galio-framework';
 import AwesomeLoading from 'react-native-awesome-loading';
 import Toast from 'react-native-toast-message';
+import Modal from 'react-native-modal';
 import { colors, commonStyles, fonts } from '../styles';
 import { hostname } from '../constant';
 import {
@@ -23,7 +24,7 @@ import {
 } from '../redux/actions';
 import { ScrollView } from 'react-native-gesture-handler';
 
-const { width } = Dimensions.get('screen');
+const { width, height } = Dimensions.get('screen');
 function wp(percentage) {
   const value = (percentage * width) / 100;
   return Math.round(value);
@@ -42,6 +43,14 @@ class ZCardScreen extends React.Component {
       comment: '',
       comments: [],
       submitting: false,
+      isReplyModal: false,
+      replyComment: '',
+      replying: false,
+      replyId: 0,
+      isMessageModal: false,
+      messageAddress: '',
+      messageContent: '',
+      sendingMessage: false,
     }
   }
 
@@ -181,6 +190,110 @@ class ZCardScreen extends React.Component {
     );
   }
 
+  sendMessage = () => {
+    const { ZCard } = this.props.route.params;
+    const { messageAddress, messageContent } = this.state;
+    if (messageAddress == '') {
+      Toast.show({
+        type: 'info',
+        position: 'top',
+        text1: 'Validation',
+        text2: 'Please input address. 😥'
+      });
+      return;
+    };
+    if (messageContent == '') {
+      Toast.show({
+        type: 'info',
+        position: 'top',
+        text1: 'Validation',
+        text2: 'Please input content. 😥'
+      });
+      return;
+    };
+    this.setState({ sendingMessage: true });
+
+    this.props.callController(
+      `/controllers/ZMail/send_zcard_message.php?zcard=${ZCard.id}`,
+      {
+        email: messageAddress,
+        content: messageContent
+      },
+      (msg) => {
+        this.setState({ isMessageModal: false, sendingMessage: false, messageAddress: '', messageContent: '' });
+        this.fetchComments();
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          text1: 'Success',
+          text2: msg + ' 🎊'
+        });
+      },
+      (msg) => {
+        this.setState({ isMessageModal: false, sendingMessage: false });
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Error',
+          text2: msg + ' 😥'
+        });
+      }
+    );
+  }
+
+  replyComment = () => {
+    const { ZCard } = this.props.route.params;
+    const { replyComment, replyId } = this.state;
+    if (replyId == 0) {
+      Toast.show({
+        type: 'info',
+        position: 'top',
+        text1: 'Validation',
+        text2: 'Please select comment to reply. 😥'
+      });
+      this.setState({ isReplyModal: false });
+      return;
+    };
+
+    if (replyComment == '') {
+      Toast.show({
+        type: 'info',
+        position: 'top',
+        text1: 'Validation',
+        text2: 'Please input reply comment. 😥'
+      });
+      return;
+    };
+    this.setState({ replying: true });
+
+    this.props.callController(
+      `/controllers/Zcard/reply_message.php?reply_to=${replyId}&id=${ZCard.id}`,
+      {
+        message: replyComment
+      },
+      (msg) => {
+        this.setState({ isReplyModal: false, replying: false, replyComment: '', replyId: 0 });
+        this.fetchComments();
+        Toast.show({
+          type: 'success',
+          position: 'top',
+          text1: 'Success',
+          text2: msg + ' 🎊'
+        });
+      },
+      (msg) => {
+        this.setState({ isReplyModal: false, replying: false });
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Error',
+          text2: msg + ' 😥'
+        });
+      }
+    );
+
+  }
+
   submitComment = () => {
     const { comment } = this.state;
     const { ZCard } = this.props.route.params;
@@ -225,7 +338,7 @@ class ZCardScreen extends React.Component {
   renderComments = (comments) => {
     if (comments.length) {
       return comments.map(comment =>
-        <Block style={[commonStyles.card, { padding: 5 }, comment.replies == undefined ? { backgroundColor: colors.background } : { backgroundColor: colors.backgroundLight }]}>
+        <Block key={comment.id} style={[commonStyles.card, { padding: 5 }, comment.replies == undefined ? { backgroundColor: colors.background } : { backgroundColor: colors.backgroundLight }]}>
           <Block row style={{ alignItems: 'center' }}>
             <Image
               style={styles.avatar}
@@ -239,13 +352,13 @@ class ZCardScreen extends React.Component {
               </Block>
               <Block row space='around'>
                 <Text italic size={14} color={colors.primaryLight} style={{ flexShrink: 1, maxWidth: wp(45) }}>{comment.content}</Text>
-                <Button
+                {comment.replies != undefined && <Button
                   color={colors.primary}
                   icon='reply' iconFamily='Entypo' iconSize={16}
                   textStyle={{ fontSize: 15 }}
                   style={{ width: 90, height: 25 }}
-                  onPress={this.replyComment}
-                > Reply</Button>
+                  onPress={() => this.setState({ replyId: comment.id, isReplyModal: true })}
+                > Reply</Button>}
               </Block>
             </Block>
           </Block>
@@ -283,7 +396,8 @@ class ZCardScreen extends React.Component {
 
   render() {
     const { ZCard } = this.props.route.params;
-    const { front_card_photo, back_card_photo, footer_photo, visitorsCount, ZcardAccount } = this.state;
+    const { front_card_photo, back_card_photo, footer_photo, visitorsCount, ZcardAccount, isReplyModal, replyComment, replying,
+      isMessageModal, messageAddress, messageContent, sendingMessage } = this.state;
     return (
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : null}
@@ -350,7 +464,7 @@ class ZCardScreen extends React.Component {
                     onlyIcon
                     color={colors.blue}
                     icon='wechat' iconFamily='AntDesign' iconSize={20}
-                    onPress={() => alert('message modal is comming soon...')}
+                    onPress={() => this.setState({ isMessageModal: true })}
                   />
                   <Button
                     onlyIcon
@@ -388,6 +502,72 @@ class ZCardScreen extends React.Component {
             </ScrollView>
           </Block>
           <Toast ref={(ref) => Toast.setRef(ref)} />
+          <Modal
+            isVisible={isReplyModal}
+            onBackdropPress={() => this.setState({ isReplyModal: false, replyId: 0 })}>
+            <Block style={styles.modalContent}>
+              <Block row style={{ alignItems: 'center' }}>
+                <Icon name="infocirlceo" family="antdesign" color={colors.blue} size={22} />
+                <Text bold color={colors.blue} size={22}> Reply to comment</Text>
+              </Block>
+              <Block style={commonStyles.divider} />
+              <TextInput
+                multiline
+                numberOfLines={3}
+                placeholder='Leave your reply...'
+                onChangeText={(replyComment) => this.setState({ replyComment })}
+                style={styles.description}>{replyComment}
+              </TextInput>
+              <Button
+                color={colors.primary}
+                icon='reply' iconFamily='Entypo' iconSize={18}
+                textStyle={{ fontSize: 18 }}
+                style={{ alignSelf: 'flex-end' }}
+                loading={replying}
+                onPress={this.replyComment}
+              > Reply</Button>
+            </Block>
+          </Modal>
+          <Modal
+            isVisible={isMessageModal}
+            onBackdropPress={() => this.setState({ isMessageModal: false })}>
+            <Block style={styles.modalContent}>
+              <Block row style={{ alignItems: 'center' }}>
+                <Icon name="infocirlceo" family="antdesign" color={colors.blue} size={22} />
+                <Text bold color={colors.blue} size={22}> Send Message</Text>
+              </Block>
+              <Block style={commonStyles.divider} />
+              <Block>
+                <Text
+                  style={styles.label}
+                  size={16}>Email Address:</Text>
+                <Input
+                  value={messageAddress}
+                  style={styles.inputBox} color={colors.primary} fontSize={18}
+                  icon='mail' family='Entypo' iconSize={18} iconColor={colors.primary}
+                  onChangeText={(messageAddress) => this.setState({ messageAddress })}
+                />
+              </Block>
+              <Text
+                style={styles.label}
+                size={16}>Message:</Text>
+              <TextInput
+                multiline
+                numberOfLines={3}
+                placeholder='Leave message...'
+                onChangeText={(messageContent) => this.setState({ messageContent })}
+                style={styles.description}>{messageContent}
+              </TextInput>
+              <Button
+                color={colors.primary}
+                icon='paper-plane' iconFamily='Entypo' iconSize={18}
+                textStyle={{ fontSize: 18 }}
+                style={{ alignSelf: 'flex-end' }}
+                loading={sendingMessage}
+                onPress={this.sendMessage}
+              > Send</Button>
+            </Block>
+          </Modal>
         </SafeAreaView>
       </KeyboardAvoidingView >
     );
@@ -443,5 +623,25 @@ const styles = StyleSheet.create({
     borderRadius: wp(80),
     alignSelf: 'center',
     marginRight: 10
+  },
+  modalContent: {
+    backgroundColor: colors.backgroundLight,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 4,
+    borderColor: 'rgba(0, 0, 0, 0.1)',
+    maxHeight: height / 2
+  },
+  label: {
+    paddingTop: 10,
+    alignSelf: 'flex-start',
+    color: colors.primaryLight
+  },
+  inputBox: {
+    borderColor: colors.border,
+    borderRadius: 8,
+    alignItems: 'center',
+    fontSize: 18,
+    paddingLeft: 8
   },
 });
