@@ -191,3 +191,22 @@ export function FetchAddSectionPermission(dispatch, id, funcName, reqArray, succ
             if (errorcb) errorcb(error);
         });
 }
+export function IncreaseVisitor(zcard_id) {
+    Client.get(`/dashboard/controllers/Log/create_log.php?zcard_id=${zcard_id}`)
+        .then(res => {
+        })
+        .catch(error => {
+            console.error(`ACTION : IncreaseVisitor error => `, error);
+        });
+}
+export function GetZCardComments(controller, successcb, errorcb) {
+    Client.get(controller)
+    .then(res => {
+        if (res.data)
+            if (successcb) successcb(res.data);
+    })
+    .catch(error => {
+        console.error(`ACTION : GetZCardComments error => `, error);
+        if (errorcb) errorcb(error);
+    });
+}

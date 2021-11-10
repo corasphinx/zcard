@@ -69,6 +69,12 @@ class HomeScreen extends React.Component {
     //   text1: 'Information',
     //   text2: 'You have cards that are expiring soon below. Simply click "Renew" on the card you need to renew to either renew your existing card, or upgrade to a different card product 😊'
     // });
+    Toast.show({
+      type: 'info',
+      position: 'top',
+      text1: 'Information',
+      text2: 'Please swipe to edit any ZCard. 😊'
+    });
   }
 
   initData = () => {
@@ -81,12 +87,6 @@ class HomeScreen extends React.Component {
       'GetUserZCards',
       [currentUser.id],
       (zcardIds) => {
-        Toast.show({
-          type: 'info',
-          position: 'top',
-          text1: 'Information',
-          text2: 'Please swipe to edit any ZCard. 😊'
-        });
         if (zcardIds && zcardIds.length)
           zcardIds.map(zcard_id => {
             this.props.fetchZCardEntry(
@@ -179,12 +179,12 @@ class HomeScreen extends React.Component {
         'actualTotalZBucks',
         [],
         (totalZBucks) => {
-          this.timerId = setInterval(()=>{
-            if(this.state.totalZBucks >= totalZBucks){
+          this.timerId = setInterval(() => {
+            if (this.state.totalZBucks >= totalZBucks) {
               clearInterval(this.timerId);
-              this.setState({totalZBucks});
-            }else{
-              this.setState({totalZBucks : this.state.totalZBucks + 10});
+              this.setState({ totalZBucks });
+            } else {
+              this.setState({ totalZBucks: this.state.totalZBucks + 10 });
             }
           }, 20);
         },
@@ -298,6 +298,96 @@ class HomeScreen extends React.Component {
     )
   }
 
+  gotoZCard = (ZCard) => {
+    if (ZCard.valid !== true) return;
+    this.setState({ loading: true });
+
+    const { currentUser } = this.props;
+    this.props.callClassFunction(
+      'Account',
+      'acc1_or_acc2_blocked',
+      [currentUser.id, ZCard.id],
+      (check_blocks) => {
+        if (check_blocks) {
+          Toast.show({
+            type: 'error',
+            position: 'top',
+            text1: 'Invalid Card',
+            text2: "How Embarassing! You tried to view a card that doesn't exist. 😥"
+          });
+          this.setState({ loading: false });
+          return;
+        } else {
+          this.props.callZCardClassFunction(
+            ZCard.id,
+            'isExpired',
+            [],
+            (isExpired) => {
+              if (isExpired) {
+                Toast.show({
+                  type: 'error',
+                  position: 'top',
+                  text1: 'Expired Card',
+                  text2: "Uh-Oh, this card is expired. 😥"
+                });
+                this.setState({ loading: false });
+                return;
+              } else {
+                this.props.callZCardClassFunction(
+                  ZCard.id,
+                  'isPublic',
+                  [],
+                  (isPublic) => {
+                    if (isPublic) {
+                      this.setState({ loading: false });
+                      this.props.navigation.navigate('ZCard', { ZCard });
+                    } else {
+                      Toast.show({
+                        type: 'error',
+                        position: 'top',
+                        text1: 'Invalid Card',
+                        text2: "How Embarassing! You tried to view a card that doesn't exist. 😥"
+                      });
+                      this.setState({ loading: false });
+                      return;
+                    }
+                  },
+                  (msg) => {
+                    this.setState({ loading: false });
+                    Toast.show({
+                      type: 'error',
+                      position: 'top',
+                      text1: 'Error',
+                      text2: msg + ' 😥'
+                    });
+                  }
+                );
+              }
+            },
+            (msg) => {
+              this.setState({ loading: false });
+              Toast.show({
+                type: 'error',
+                position: 'top',
+                text1: 'Error',
+                text2: msg + ' 😥'
+              });
+            }
+          );
+        }
+      },
+      (msg) => {
+        this.setState({ loading: false });
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Error',
+          text2: msg + ' 😥'
+        });
+      }
+    )
+  }
+
   renderMyCards = () => {
     const { zcards, isExpandedMyCards } = this.state;
 
@@ -320,7 +410,7 @@ class HomeScreen extends React.Component {
           renderItem={(data, rowMap) => (
             <TouchableOpacity style={commonStyles.listRow} key={data.item.id}
               activeOpacity={1.0}
-              onPress={() => alert('zcard#' + data.item.id)}
+              onPress={() => this.gotoZCard(data.item)}
             >
               <Block row style={{ width: 100 + '%' }}>
                 <Block center>
@@ -489,6 +579,8 @@ function mapDispatchToProps(dispatch) {
     setSelectedZCard: (zcard) => SetSelectedZCard(dispatch, zcard),
     zcard_zmodule_total_monthly: (id, funcName, reqArray, successcb, errorcb) => CallZCardClassFunction(id, funcName, reqArray, successcb, errorcb),
     deleteCard: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
+    callClassFunction: (className, funcName, reqArray, successcb, errorcb) => CallClassFunction(className, funcName, reqArray, successcb, errorcb),
+    callZCardClassFunction: (id, funcName, reqArray, successcb, errorcb) => CallZCardClassFunction(id, funcName, reqArray, successcb, errorcb),
   };
 }
 export default connect(

@@ -16,6 +16,7 @@ import SignInScreen from '../pages/SignInScreen';
 import HomeScreen from '../pages/HomeScreen';
 import CharterPricingScreen from '../pages/CharterPricingScreen';
 import CharterJoinScreen from '../pages/CharterJoinScreen';
+import ZCardScreen from '../pages/ZCardScreen';
 
 const drawerData = [
   {
@@ -152,6 +153,11 @@ class App extends React.Component {
         <Stack.Screen
           name="EditCard"
           component={EditCardStack}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ZCard"
+          component={ZCardScreen}
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

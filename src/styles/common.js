@@ -23,9 +23,9 @@ export default StyleSheet.create({
     textDecorationLine: 'underline'
   },
   badge: {
-    borderWidth: 1,
+    // borderWidth: 1,
     borderRadius: 5,
-    backgroundColor: colors.primaryLight,
+    backgroundColor: colors.pink,
     paddingHorizontal: 5
   },
   button: {
