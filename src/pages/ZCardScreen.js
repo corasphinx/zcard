@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { StyleSheet, TouchableOpacity, Image, Dimensions, SafeAreaView, KeyboardAvoidingView, Linking, Animated, Platform, TextInput } from 'react-native';
+import { StyleSheet, TouchableOpacity, Image, Dimensions, SafeAreaView, KeyboardAvoidingView, Linking, Platform, TextInput } from 'react-native';
 import {
   Block,
   Button,
@@ -13,6 +13,10 @@ import {
 import AwesomeLoading from 'react-native-awesome-loading';
 import Toast from 'react-native-toast-message';
 import Modal from 'react-native-modal';
+import PdfThumbnail from "react-native-pdf-thumbnail";
+import HTMLView from 'react-native-htmlview';
+import { Collapse, CollapseHeader, CollapseBody } from 'accordion-collapse-react-native';
+import { WebView } from 'react-native-webview';
 import { colors, commonStyles, fonts } from '../styles';
 import { hostname } from '../constant';
 import {
@@ -29,6 +33,21 @@ function wp(percentage) {
   const value = (percentage * width) / 100;
   return Math.round(value);
 }
+
+const getTabColor = (color) => {
+  if (color == null)
+    return colors.default_module_tab_color;
+  else
+    return color;
+}
+
+const getFontColor = (color) => {
+  if (color == null)
+    return colors.default_module_tab_font_color;
+  else
+    return color;
+}
+
 
 class ZCardScreen extends React.Component {
   constructor(props) {
@@ -51,6 +70,7 @@ class ZCardScreen extends React.Component {
       messageAddress: '',
       messageContent: '',
       sendingMessage: false,
+      sections: [],
     }
   }
 
@@ -169,6 +189,114 @@ class ZCardScreen extends React.Component {
 
     // fetch comments
     this.fetchComments();
+
+    // fetch all sections
+    const { currentUser } = this.props;
+    this.props.callZCardClassFunction(
+      ZCard.id,
+      'constructMobileSectionsHTML',
+      [{ id: currentUser.id }, true],
+      (sections) => {
+        sections.map(section => {
+          if (section.friendly_id == 'module_section') {
+
+            // fetch Zmodule_Info _permalink
+            this.props.callClassFunction(
+              'Zmodule',
+              'info',
+              [section.general_value],
+              (Zmodule_Info) => {
+
+                // fetch Zmodule_Data
+                this.props.callClassFunction(
+                  'Zmodule',
+                  'select_zmodule_data',
+                  [{
+                    _permalink: Zmodule_Info[0]._permalink,
+                    zcard: ZCard.id,
+                    section: section.id
+                  }],
+                  (Zmodule_Data) => {
+                    if (Zmodule_Data) {
+                      let newSection = section;
+                      newSection.tab_color = ZCard.force_color == 0 && Zmodule_Data[0].tab_color ? Zmodule_Data[0].tab_color : ZCard.card_color;
+                      newSection.font_color = ZCard.force_font_color == 0 && Zmodule_Data[0].tab_font_color ? Zmodule_Data[0].tab_font_color : ZCard.card_font_color;
+                      newSection.name = Zmodule_Data[0].section_title;
+                      newSection.permalink = Zmodule_Info[0]._permalink;
+
+                      switch (section.permalink) {
+                        case 'market-section':
+                          this.props.callClassFunction(
+                            'Zmodule',
+                            'market_products',
+                            [ZCard.id, true],
+                            (products) => {
+                              newSection.products = products;
+                              this.setState({ sections: [...this.state.sections, newSection] });
+                            },
+                            () => {
+                              newSection.products = [];
+                              this.setState({ sections: [...this.state.sections, newSection] });
+                            }
+                          );
+                          break;
+                        case 'business-search':
+                          this.props.callClassFunction(
+                            'Zmodule',
+                            'business_search_defaults',
+                            [[Zmodule_Data[0].business_state, Zmodule_Data[0].business_city, Zmodule_Data[0].section], true],
+                            (businesses) => {
+                              newSection.businesses = businesses;
+                              this.setState({ sections: [...this.state.sections, newSection] });
+                            },
+                            () => {
+                              newSection.businesses = [];
+                              this.setState({ sections: [...this.state.sections, newSection] });
+                            }
+                          );
+                          break;
+                        case 'job-opening':
+                          this.props.callClassFunction(
+                            'Zmodule',
+                            'job_openings',
+                            [[Zmodule_Data[0].group_id, Zmodule_Data[0].section], true],
+                            (jobs) => {
+                              newSection.jobs = jobs;
+                              this.setState({ sections: [...this.state.sections, newSection] });
+                            },
+                            () => {
+                              newSection.jobs = [];
+                              this.setState({ sections: [...this.state.sections, newSection] });
+                            }
+                          );
+                          break;
+                        default:
+                          this.setState({ sections: [...this.state.sections, newSection] });
+                      }
+
+                    }
+                  }
+                );
+              }
+            );
+          } else {
+            let newSection = section;
+            newSection.tab_color = ZCard.force_color == 1 ? ZCard.card_color : newSection.tab_color;
+            newSection.font_color = ZCard.force_font_color == 1 ? ZCard.card_font_color : newSection.font_color;
+            this.setState({ sections: [...this.state.sections, newSection] });
+          }
+        })
+      },
+      (msg) => {
+        this.setState({ loading: false });
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Error',
+          text2: msg + ' 😥'
+        });
+      }
+    )
   }
 
   fetchComments = () => {
@@ -394,6 +522,121 @@ class ZCardScreen extends React.Component {
 
   }
 
+  renderMarketProducts = (section) => {
+    return section.products.map((product, index) => <Block style={[commonStyles.card, { padding: 10 }]}>
+      <Text bold size={18} color={colors.primary}>{index + 1}. {product.product_name}</Text>
+      {product.image_src && <Image
+        style={styles.image}
+        source={{ uri: product.image_src }}
+      />}
+      <HTMLView
+        style={{ padding: 10 }}
+        value={product.product_description}
+      />
+      <Block style={{ alignItems: 'flex-end' }}>
+        <Text italic size={16} color={colors.green}>${product.product_price}</Text>
+      </Block>
+    </Block>)
+  }
+  renderBusinessSearch = (section) => {
+    return section.businesses.map(business =>
+      <Block row style={[commonStyles.card, { padding: 10 }]}>
+        <Image
+          style={styles.businessImage}
+          source={{ uri: hostname + business.logo }}
+        />
+        <Block>
+          <Text bold size={18} color={colors.primary}> {business.business_name}</Text>
+          <HTMLView
+            style={{ padding: 10, maxWidth: wp(50) }}
+            value={business.business_description}
+          />
+        </Block>
+      </Block>);
+  }
+  renderJopOpening = (section) => {
+    return section.jobs.map(job =>
+      <Block row style={[commonStyles.card, { padding: 10 }]}>
+        <Image
+          style={styles.businessImage}
+          source={{ uri: hostname + job.logo }}
+        />
+        <Block>
+          <Text bold size={18} color={colors.primary}> {job.job_title}</Text>
+          <HTMLView
+            style={{ padding: 10, maxWidth: wp(50) }}
+            value={job.job_desc}
+          />
+        </Block>
+      </Block>);
+  }
+
+  renderSectionHTML = (section) => {
+    switch (section.permalink) {
+      case 'market-section':
+        return this.renderMarketProducts(section);
+      case 'business-search':
+        return this.renderBusinessSearch(section);
+      case 'job-opening':
+        return this.renderJopOpening(section);
+      default:
+        break;
+    }
+  }
+
+  renderAllSections = () => {
+    const { sections } = this.state;
+    return sections.map(section =>
+      <Collapse
+        // isExpanded={true}
+        key={section.id}
+        style={{ marginHorizontal: 10, marginVertical: 5 }}
+
+      >
+        <CollapseHeader>
+          <Block style={[commonStyles.collapseTitle, commonStyles.shadow, { backgroundColor: getTabColor(section.tab_color), alignItems: 'flex-start' }]}>
+            <Text bold size={18} color={getFontColor(section.font_color)}>{section.name}</Text>
+          </Block>
+        </CollapseHeader>
+        <CollapseBody
+          style={[commonStyles.shadow, commonStyles.collapseBody]}
+        >
+          {section.image_url != null && <Block center>
+            <Image
+              style={styles.image}
+              source={{ uri: hostname + section.image_url }}
+            />
+          </Block>}
+          {section.section_video != null && <Block center>
+            <WebView
+              style={styles.webview}
+              source={{ uri: section.section_video }}
+            />
+          </Block>}
+          {/* {section.pdf_url != null && <Block center>
+            <Image
+              source={PdfThumbnail.generate(section.pdf_url, 0)}
+              resizeMode="contain"
+              style={styles.thumbnailPDFImage}
+            />
+          </Block>} */}
+          {section.friendly_id == 'facebook_embed' && section.general_value != null && <Block>
+            <TouchableOpacity onPress={() => Linking.openURL(`https://${section.general_value}`)}>
+              <Text size={18} color={colors.blue} style={commonStyles.underline}>{section.general_value}</Text>
+            </TouchableOpacity>
+          </Block>}
+          {section.friendly_id == 'module_section' && this.renderSectionHTML(section)}
+          {section.friendly_id != 'module_section' && section.section_html != null && <Block>
+            <HTMLView
+              style={{ padding: 10 }}
+              value={section.section_html}
+            />
+          </Block>}
+        </CollapseBody>
+      </Collapse>
+    );
+  }
+
   render() {
     const { ZCard } = this.props.route.params;
     const { front_card_photo, back_card_photo, footer_photo, visitorsCount, ZcardAccount, isReplyModal, replyComment, replying,
@@ -491,6 +734,7 @@ class ZCardScreen extends React.Component {
               </Block>
               }
 
+              {this.renderAllSections()}
               {this.renderCommentSection()}
 
               {footer_photo != '' && <Block style={[commonStyles.Card, { margin: 10, padding: 0 }]}>
@@ -608,6 +852,14 @@ const styles = StyleSheet.create({
     height: width - 20,
     borderRadius: 8
   },
+  webview: {
+    alignSelf: 'center',
+    // resizeMode: 'stretch',
+    width: width - 20,
+    height: width - 20,
+    maxHeight: width,
+    borderRadius: 8
+  },
   description: {
     borderWidth: 1,
     borderRadius: 8,
@@ -644,4 +896,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     paddingLeft: 8
   },
+  thumbnailPDFImage: {
+    width: wp(40),
+    height: wp(60),
+  },
+  businessImage: {
+    width: wp(20),
+    height: wp(20),
+  }
 });
