@@ -116,7 +116,7 @@ class CharterPricingScreen extends React.Component {
             color={colors.primary}
             icon='checkcircleo' iconFamily='AntDesign' iconSize={18}
             textStyle={{ fontSize: 18 }}
-            onPress={() => alert('mobile stripe is comming soon')}
+            onPress={() => alert('visit your wallet')}
           > Get Started</Button>
         </Block>
       </Block>

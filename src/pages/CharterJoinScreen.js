@@ -250,7 +250,7 @@ class CharterJoinScreen extends React.Component {
                     color={colors.green}
                     icon='checkcircleo' iconFamily='AntDesign' iconSize={18}
                     textStyle={{ fontSize: 18 }}
-                    onPress={() => alert('zwallet.php is comming soon')}
+                    onPress={() => alert('visit your wallet')}
                   > View Your ZWallet</Button>}
                 </Block>
               </Block>
@@ -279,7 +279,7 @@ class CharterJoinScreen extends React.Component {
                 // pickerStyle={{ backgroundColor: colors.primaryLight, borderRadius: 10, height: 300 }}
                 containerStyle={{ width: width * 0.7 }}
                 data={ProductDatas}
-                onChangeText={(value) => alert(`pay.php is comming with [products=${value}]`)}
+                onChangeText={(value) => alert(`visit your wallet with [products=${value}]`)}
               />
             </Block>
           </Modal>

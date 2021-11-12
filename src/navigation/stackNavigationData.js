@@ -343,7 +343,7 @@ const StackNavigationData = [
   },
   {
     name: 'Ztext',
-    title: 'Ztext is comming soon',
+    title: 'Ztext Section',
     component: TextSectionScreen,
     headerLeft: headerLeftComponent,
     headerBackground: { source: headerBackground },
