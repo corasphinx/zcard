@@ -53,6 +53,7 @@ class HomeScreen extends React.Component {
       isExpandedEnterpriseCards: false,
       isDeleteModal: false,
       selected_zcard_id: 0,
+      isRenderTip: true,
     }
   }
 
@@ -69,12 +70,12 @@ class HomeScreen extends React.Component {
     //   text1: 'Information',
     //   text2: 'You have cards that are expiring soon below. Simply click "Renew" on the card you need to renew to either renew your existing card, or upgrade to a different card product 😊'
     // });
-    Toast.show({
-      type: 'info',
-      position: 'top',
-      text1: 'Information',
-      text2: 'Please swipe to edit any ZCard. 😊'
-    });
+    // Toast.show({
+    //   type: 'info',
+    //   position: 'top',
+    //   text1: 'Information',
+    //   text2: 'Please swipe to edit any ZCard. 😊'
+    // });
   }
 
   initData = () => {
@@ -530,8 +531,18 @@ class HomeScreen extends React.Component {
     </Block>
   }
 
+  renderTip = () => {
+    return <Block style={[commonStyles.Card, { marginHorizontal: 10, backgroundColor: colors.primaryLight }]}>
+      <TouchableOpacity onPress={() => this.setState({ isRenderTip: false })}>
+        <Icon name='close' family='AntDesign' color={colors.white} size={20}
+          style={{ alignSelf: 'flex-end' }} />
+      </TouchableOpacity>
+      <Text italic size={18} color={colors.white}>In order to edit, or delete cards, swipe left on the card box below to reveal edit and delete options. If you click on a card below, you'll view the card. </Text>
+    </Block>
+  }
+
   render = () => {
-    const { zcards, user_partner_profiles, loading, isDeleteModal } = this.state;
+    const { zcards, user_partner_profiles, loading, isDeleteModal, isRenderTip } = this.state;
 
     return (
       <KeyboardAvoidingView
@@ -542,6 +553,7 @@ class HomeScreen extends React.Component {
           <Block style={styles.container}>
             <ScrollView nestedScrollEnabled={true}>
               {this.renderSlogan()}
+              {isRenderTip && this.renderTip()}
               {loading && <ActivityIndicator size="large" color="green" animating={loading} />}
               {zcards.length == 0 && !loading && this.renderActiveCard()}
               {zcards.length > 0 && !loading && this.renderMyCards()}
