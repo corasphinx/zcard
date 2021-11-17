@@ -180,6 +180,7 @@ class HomeScreen extends React.Component {
         'actualTotalZBucks',
         [],
         (totalZBucks) => {
+          totalZBucks = Math.round(totalZBucks * 100) / 100;
           this.timerId = setInterval(() => {
             if (this.state.totalZBucks >= totalZBucks) {
               clearInterval(this.timerId);
@@ -532,7 +533,7 @@ class HomeScreen extends React.Component {
   }
 
   renderTip = () => {
-    return <Block style={[commonStyles.Card, { marginHorizontal: 10, backgroundColor: colors.primaryLight }]}>
+    return <Block style={[commonStyles.Card, { marginHorizontal: 10, backgroundColor: colors.blue }]}>
       <TouchableOpacity onPress={() => this.setState({ isRenderTip: false })}>
         <Icon name='close' family='AntDesign' color={colors.white} size={20}
           style={{ alignSelf: 'flex-end' }} />

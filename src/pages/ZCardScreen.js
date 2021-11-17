@@ -197,95 +197,107 @@ class ZCardScreen extends React.Component {
       'constructMobileSectionsHTML',
       [{ id: currentUser.id }, true],
       (sections) => {
-        sections.map(section => {
-          if (section.friendly_id == 'module_section') {
+        if (sections) {
+          sections.map(section => {
+            if (section.friendly_id == 'module_section') {
 
-            // fetch Zmodule_Info _permalink
-            this.props.callClassFunction(
-              'Zmodule',
-              'info',
-              [section.general_value],
-              (Zmodule_Info) => {
+              // fetch Zmodule_Info _permalink
+              this.props.callClassFunction(
+                'Zmodule',
+                'info',
+                [section.general_value],
+                (Zmodule_Info) => {
 
-                // fetch Zmodule_Data
-                this.props.callClassFunction(
-                  'Zmodule',
-                  'select_zmodule_data',
-                  [{
-                    _permalink: Zmodule_Info[0]._permalink,
-                    zcard: ZCard.id,
-                    section: section.id
-                  }],
-                  (Zmodule_Data) => {
-                    if (Zmodule_Data) {
-                      let newSection = section;
-                      newSection.tab_color = ZCard.force_color == 0 && Zmodule_Data[0].tab_color ? Zmodule_Data[0].tab_color : ZCard.card_color;
-                      newSection.font_color = ZCard.force_font_color == 0 && Zmodule_Data[0].tab_font_color ? Zmodule_Data[0].tab_font_color : ZCard.card_font_color;
-                      newSection.name = Zmodule_Data[0].section_title;
-                      newSection.permalink = Zmodule_Info[0]._permalink;
+                  // fetch Zmodule_Data
+                  if (Zmodule_Info) {
 
-                      switch (section.permalink) {
-                        case 'market-section':
-                          this.props.callClassFunction(
-                            'Zmodule',
-                            'market_products',
-                            [ZCard.id, true],
-                            (products) => {
-                              newSection.products = products;
-                              this.setState({ sections: [...this.state.sections, newSection] });
+                    this.props.callClassFunction(
+                      'Zmodule',
+                      'select_zmodule_data',
+                      [{
+                        _permalink: Zmodule_Info[0]._permalink,
+                        zcard: ZCard.id,
+                        section: section.id
+                      }],
+                      (Zmodule_Data) => {
+                        if (Zmodule_Data) {
+                          this.props.callController(
+                            '/controllers/App/file_exists.php',
+                            {
+                              file: `../../zmodule_files/${Zmodule_Info[0]._permalink}/public-view.php`
                             },
                             () => {
-                              newSection.products = [];
-                              this.setState({ sections: [...this.state.sections, newSection] });
+                              let newSection = section;
+                              newSection.tab_color = ZCard.force_color == 0 && Zmodule_Data[0].tab_color ? Zmodule_Data[0].tab_color : ZCard.card_color;
+                              newSection.font_color = ZCard.force_font_color == 0 && Zmodule_Data[0].tab_font_color ? Zmodule_Data[0].tab_font_color : ZCard.card_font_color;
+                              newSection.name = Zmodule_Data[0].section_title;
+                              newSection.permalink = Zmodule_Info[0]._permalink;
+
+                              switch (section.permalink) {
+                                case 'market-section':
+                                  this.props.callClassFunction(
+                                    'Zmodule',
+                                    'market_products',
+                                    [ZCard.id, true],
+                                    (products) => {
+                                      newSection.products = products;
+                                      this.setState({ sections: [...this.state.sections, newSection] });
+                                    },
+                                    () => {
+                                      newSection.products = [];
+                                      this.setState({ sections: [...this.state.sections, newSection] });
+                                    }
+                                  );
+                                  break;
+                                case 'business-search':
+                                  this.props.callClassFunction(
+                                    'Zmodule',
+                                    'business_search_defaults',
+                                    [[Zmodule_Data[0].business_state, Zmodule_Data[0].business_city, Zmodule_Data[0].section], true],
+                                    (businesses) => {
+                                      newSection.businesses = businesses;
+                                      this.setState({ sections: [...this.state.sections, newSection] });
+                                    },
+                                    () => {
+                                      newSection.businesses = [];
+                                      this.setState({ sections: [...this.state.sections, newSection] });
+                                    }
+                                  );
+                                  break;
+                                case 'job-opening':
+                                  this.props.callClassFunction(
+                                    'Zmodule',
+                                    'job_openings',
+                                    [[Zmodule_Data[0].group_id, Zmodule_Data[0].section], true],
+                                    (jobs) => {
+                                      newSection.jobs = jobs;
+                                      this.setState({ sections: [...this.state.sections, newSection] });
+                                    },
+                                    () => {
+                                      newSection.jobs = [];
+                                      this.setState({ sections: [...this.state.sections, newSection] });
+                                    }
+                                  );
+                                  break;
+                                default:
+                                  this.setState({ sections: [...this.state.sections, newSection] });
+                              }
                             }
                           );
-                          break;
-                        case 'business-search':
-                          this.props.callClassFunction(
-                            'Zmodule',
-                            'business_search_defaults',
-                            [[Zmodule_Data[0].business_state, Zmodule_Data[0].business_city, Zmodule_Data[0].section], true],
-                            (businesses) => {
-                              newSection.businesses = businesses;
-                              this.setState({ sections: [...this.state.sections, newSection] });
-                            },
-                            () => {
-                              newSection.businesses = [];
-                              this.setState({ sections: [...this.state.sections, newSection] });
-                            }
-                          );
-                          break;
-                        case 'job-opening':
-                          this.props.callClassFunction(
-                            'Zmodule',
-                            'job_openings',
-                            [[Zmodule_Data[0].group_id, Zmodule_Data[0].section], true],
-                            (jobs) => {
-                              newSection.jobs = jobs;
-                              this.setState({ sections: [...this.state.sections, newSection] });
-                            },
-                            () => {
-                              newSection.jobs = [];
-                              this.setState({ sections: [...this.state.sections, newSection] });
-                            }
-                          );
-                          break;
-                        default:
-                          this.setState({ sections: [...this.state.sections, newSection] });
+                        }
                       }
-
-                    }
+                    );
                   }
-                );
-              }
-            );
-          } else {
-            let newSection = section;
-            newSection.tab_color = ZCard.force_color == 1 ? ZCard.card_color : newSection.tab_color;
-            newSection.font_color = ZCard.force_font_color == 1 ? ZCard.card_font_color : newSection.font_color;
-            this.setState({ sections: [...this.state.sections, newSection] });
-          }
-        })
+                }
+              );
+            } else {
+              let newSection = section;
+              newSection.tab_color = ZCard.force_color == 1 ? ZCard.card_color : newSection.tab_color;
+              newSection.font_color = ZCard.force_font_color == 1 ? ZCard.card_font_color : newSection.font_color;
+              this.setState({ sections: [...this.state.sections, newSection] });
+            }
+          });
+        }
       },
       (msg) => {
         this.setState({ loading: false });
@@ -466,7 +478,7 @@ class ZCardScreen extends React.Component {
   renderComments = (comments) => {
     if (comments.length) {
       return comments.map(comment =>
-        <Block key={comment.id} style={[commonStyles.card, { padding: 5 }, comment.replies == undefined ? { backgroundColor: colors.background } : { backgroundColor: colors.backgroundLight }]}>
+        <Block key={comment.id} style={[commonStyles.card, { padding: 5, margin: 5 }, comment.replies == undefined ? { backgroundColor: colors.background } : { backgroundColor: colors.backgroundLight }]}>
           <Block row style={{ alignItems: 'center' }}>
             <Image
               style={styles.avatar}
