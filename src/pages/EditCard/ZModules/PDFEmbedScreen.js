@@ -422,8 +422,8 @@ class PDFEmbedScreen extends Component {
           })}
         />
       </Block>
-      <Block style={[commonStyles.card, { height: 100 }]}>
-        <Text size={22} color={colors.primary} style={{ alignSelf: 'center', marginTop: 30 }}>Preview Section</Text>
+      <Block style={[commonStyles.card, { height: 100, backgroundColor: tab_color }]}>
+        <Text size={22} color={tab_font_color} style={{ alignSelf: 'center', marginTop: 30 }}>Preview Section</Text>
       </Block>
       <Block style={{ alignItems: 'flex-end', justifyContent: 'flex-end', marginTop: 20 }}>
         <Button

@@ -40,6 +40,17 @@ class ZMarketSectionScreen extends Component {
     };
   }
 
+  componentDidMount = () => {
+    const { section } = this.props.route.params;
+    if (section) {
+      this.setState({
+        section_title: section.name,
+        tab_color: section.tab_color,
+        tab_font_color: section.tab_font_color,
+      });
+    }
+  }
+
   renderScreens = ({ item, index }) => {
     switch (item.index) {
       case 0:
@@ -58,8 +69,7 @@ class ZMarketSectionScreen extends Component {
   save = () => {
     this.setState({ saving: true });
     const { selectedZCard } = this.props;
-    const { product } = this.props.route.params;
-    const { section_title, tab_color, tab_font_color } = this.state;
+    const { product, section } = this.props.route.params;
 
     let validation = this.isValidate();
     if (validation != '') {
@@ -73,70 +83,80 @@ class ZMarketSectionScreen extends Component {
       return;
     }
 
-    // add zmodule
-    this.props.callController(
-      '/controllers/Zcard/add_zmodule_section.php',
-      {
-        zcard_id: selectedZCard.id,
-        product_id: product.id
-      },
-      (res) => {
-        let url = res.zmodule_wizard_url;
-        let params = url.split('/');
-        const identifier = params[4]; // string
-        const zcard = params[5];  // same as zcard_id
-        const section = params[6];
-        let page = params[7];
+    if (!section) {
+      // add zmodule
+      this.props.callController(
+        '/controllers/Zcard/add_zmodule_section.php',
+        {
+          zcard_id: selectedZCard.id,
+          product_id: product.id
+        },
+        (res) => {
+          let url = res.zmodule_wizard_url;
+          let params = url.split('/');
+          const identifier = params[4]; // string
+          const zcard = params[5];  // same as zcard_id
+          const section = params[6];
+          let page = params[7];
 
-        // save title
+          this.saveSection(identifier, zcard, section, page);
+        },
+        (msg) => {
+          this.setState({ saving: false });
+          Toast.show({
+            type: 'error',
+            position: 'top',
+            text1: 'Error',
+            text2: msg + ' 😥'
+          });
+        },
+        true
+      )
+    } else {
+      this.saveSection(section.general_value, selectedZCard.id, section.id, 1);
+    }
+  }
+
+  saveSection = (identifier, zcard, section, page) => {
+    const { section_title, tab_color, tab_font_color } = this.state;
+    // save title
+    this.props.callController(
+      `/zmodule_files/${identifier}/controllers/${page}.php`,
+      {
+        section_title,
+        zcard,
+        section
+      },
+      (msg) => {
+        page++;
+        // save Colors
         this.props.callController(
-          `/zmodule_files/${identifier}/controllers/${page}.php`,
+          `/zmodule_files/GLOBAL-ZMODULE-FILES/controllers/section-colors.php`,
           {
-            section_title,
-            zcard,
-            section
+            zmodule_identifier: identifier,
+            zcard: zcard,
+            section: section,
+            tab_color: tab_color,
+            tab_font_color: tab_font_color
           },
           (msg) => {
-            page++;
-            // save Colors
+            // complete saving
             this.props.callController(
-              `/zmodule_files/GLOBAL-ZMODULE-FILES/controllers/section-colors.php`,
+              '/zmodule_files/mark_section_complete.php',
               {
-                zmodule_identifier: identifier,
-                zcard: zcard,
-                section: section,
-                tab_color: tab_color,
-                tab_font_color: tab_font_color
+                section
               },
               (msg) => {
-                // complete saving
-                this.props.callController(
-                  '/zmodule_files/mark_section_complete.php',
-                  {
-                    section
-                  },
-                  (msg) => {
-                    this.setState({ saving: false });
-                    Toast.show({
-                      type: 'success',
-                      position: 'top',
-                      text1: 'Success',
-                      text2: msg + ' 🎊'
-                    });
-                    setTimeout(() => {
-                      this.props.navigation.pop(2);
-                    }, 2000);
-                  },
-                  (msg) => {
-                    this.setState({ saving: false });
-                    Toast.show({
-                      type: 'error',
-                      position: 'top',
-                      text1: 'Error',
-                      text2: msg + ' 😥'
-                    });
-                  },
-                )
+                this.setState({ saving: false });
+                Toast.show({
+                  type: 'success',
+                  position: 'top',
+                  text1: 'Success',
+                  text2: msg + ' 🎊'
+                });
+                setTimeout(() => {
+                  this.props.navigation.pop(2);
+                }, 2000);
               },
               (msg) => {
                 this.setState({ saving: false });
@@ -147,7 +167,7 @@ class ZMarketSectionScreen extends Component {
                   text2: msg + ' 😥'
                 });
               },
-            );
+            )
           },
           (msg) => {
             this.setState({ saving: false });
@@ -158,7 +178,7 @@ class ZMarketSectionScreen extends Component {
               text2: msg + ' 😥'
             });
           },
-        )
+        );
       },
       (msg) => {
         this.setState({ saving: false });
@@ -169,12 +189,10 @@ class ZMarketSectionScreen extends Component {
           text2: msg + ' 😥'
         });
       },
-      true
     )
   }
-
   renderScreen0 = (title, index) => {
-    const {section_title} = this.state;
+    const { section_title } = this.state;
     return <Block style={[commonStyles.Card, { minHeight: height - 130 }]}>
       <Text h6 color={colors.primary}>{index + 1}. {title}</Text>
       <Block style={commonStyles.divider} />
@@ -189,10 +207,10 @@ class ZMarketSectionScreen extends Component {
           style={styles.label}
           size={16}>ZModule Title</Text>
         <Input
-        value={section_title}
+          value={section_title}
           style={styles.inputBox} color={colors.primary} fontSize={18}
           icon='infocirlceo' family='AntDesign' iconSize={18} iconColor={colors.primary}
-          onChangeText={(section_title)=>this.setState({section_title})}
+          onChangeText={(section_title) => this.setState({ section_title })}
         />
       </Block>
     </Block>
@@ -235,8 +253,8 @@ class ZMarketSectionScreen extends Component {
           })}
         />
       </Block>
-      <Block style={[commonStyles.card, { height: 100 }]}>
-        <Text size={22} color={colors.primary} style={{ alignSelf: 'center', marginTop: 30 }}>Preview Section</Text>
+      <Block style={[commonStyles.card, { height: 100, backgroundColor: tab_color }]}>
+        <Text size={22} color={tab_font_color} style={{ alignSelf: 'center', marginTop: 30 }}>Preview Section</Text>
       </Block>
       <Block style={{ alignItems: 'flex-end', justifyContent: 'flex-end', marginTop: 20 }}>
         <Button

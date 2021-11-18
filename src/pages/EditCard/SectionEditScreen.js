@@ -6,6 +6,7 @@ import {
   Dimensions,
   SafeAreaView,
   KeyboardAvoidingView,
+  TouchableOpacity,
 } from 'react-native';
 
 import {
@@ -35,7 +36,7 @@ class SectionEditScreen extends React.Component {
       loading: true,
       saving: false,
       reseting: false,
-      canAdd:false,
+      canAdd: false,
     }
   }
 
@@ -47,7 +48,7 @@ class SectionEditScreen extends React.Component {
       selectedZCard.id,
       'addSectionPermission',
       [],
-      (canAdd) => {this.setState({canAdd})},
+      (canAdd) => { this.setState({ canAdd }) },
       (msg) => {
         Toast.show({
           type: 'error',
@@ -121,8 +122,81 @@ class SectionEditScreen extends React.Component {
     );
   }
 
+  goToScreen = (section) => {
+    const { navigation } = this.props;
+    switch (section.general_value) {
+      case 'job-opening':
+        navigation.navigate('JobOpenings', { section });
+        break;
+      case 'market-section':
+        navigation.navigate('ZMarketSection', { section });
+        break;
+      case 'embed-section':
+        navigation.navigate('EmbedSection', { section });
+        break;
+      case 'image-section':
+        navigation.navigate('ImageSection', { section });
+        break;
+      case 'text-section':
+        navigation.navigate('TextSection', { section });
+        break;
+      case 'pdf-section':
+        navigation.navigate('PDFEmbed', { section });
+        break;
+      case 'facebook-embed':
+        navigation.navigate('FacebookEmbed', { section });
+        break;
+      case 'instagram-embed':
+        navigation.navigate('InstagramEmbed', { section });
+        break;
+      case 'twitter-embed':
+        navigation.navigate('TwitterEmbed', { section });
+        break;
+      case 'zlive-section':
+        navigation.navigate('ZLiveSection', { section });
+        break;
+      case 'business-search':
+        navigation.navigate('BusinessSearchModule', { section });
+        break;
+      case 'youtube-embed':
+        navigation.navigate('YouTubeEmbed', { section });
+        break;
+      case 'html-section':
+        navigation.navigate('HTMLSection', { section });
+        break;
+
+      // default:
+      //   {
+      //     switch (section.friendly_id) {
+      //       case 'text_section':
+      //         navigation.navigate('TextSection', { section });
+      //         break;
+      //       case 'pdf_section':
+      //         navigation.navigate('PDFEmbed', { section });
+      //         break;
+      //       case 'default_section':
+      //         navigation.navigate('HTMLSection', { section });
+      //         break;
+      //       case 'custom_video':
+      //         navigation.navigate('VideoEmbed', { section });
+      //         break;
+      //       case 'custom_image':
+      //         navigation.navigate('ImageSection', { section });
+      //         break;
+      //       case 'facebook_embed':
+      //         navigation.navigate('FacebookEmbed', { section });
+      //         break;
+
+      //       default:
+      //         break;
+      //     }
+      //   }
+      //   break;
+    }
+  }
+
   render = () => {
-    const {currentSections} = this.props;
+    const { currentSections } = this.props;
     const { saving, reseting, canAdd } = this.state;
     return (
       <DraxProvider>
@@ -134,15 +208,17 @@ class SectionEditScreen extends React.Component {
           {currentSections && <DraxList
             data={currentSections}
             renderItemContent={({ item }, { viewState, hover }) => (
-              <Block
-                style={[
-                  styles.sectionItem,
-                  { backgroundColor: item.tab_color },
-                  (viewState?.dragStatus === DraxViewDragStatus.Dragging && hover) ? styles.hover : undefined,
-                ]}
-              >
-                <Text size={18} color={item.tab_font_color} style={{ flexShrink: 1 }}>{item.name}</Text>
-              </Block>
+              <TouchableOpacity onPress={() => this.goToScreen(item)}>
+                <Block
+                  style={[
+                    styles.sectionItem,
+                    { backgroundColor: item.tab_color },
+                    (viewState?.dragStatus === DraxViewDragStatus.Dragging && hover) ? styles.hover : undefined,
+                  ]}
+                >
+                  <Text size={18} color={item.tab_font_color} style={{ flexShrink: 1 }}>{item.name} - {item.general_value}</Text>
+                </Block>
+              </TouchableOpacity>
             )}
             onItemDragStart={({ index, item }) => {
               // console(`Item #${index} (${item}) drag start`);
@@ -188,7 +264,7 @@ class SectionEditScreen extends React.Component {
           />}
           <Toast ref={(ref) => Toast.setRef(ref)} />
         </SafeAreaView>
-        <Block style={{backgroundColor:colors.backgroundLight}}>
+        <Block style={{ backgroundColor: colors.backgroundLight }}>
           <Block style={commonStyles.divider} />
           <Block row center>
             <Button
@@ -225,14 +301,14 @@ function mapStateToProps(state) {
   return {
     currentUser: state.currentUser,
     selectedZCard: state.selectedZCard,
-    currentSections:state.currentSections
+    currentSections: state.currentSections
   };
 }
 function mapDispatchToProps(dispatch) {
   return {
     getAllSectionEditHTML: (id, funcName, reqArray, successcb, errorcb) => GetAllSectionEditHTML(dispatch, id, funcName, reqArray, successcb, errorcb),
     update_section_order: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
-    setCurrentSections:(sections)=>SetCurrentSections(dispatch, sections),
+    setCurrentSections: (sections) => SetCurrentSections(dispatch, sections),
     fetchAddSectionPermission: (id, funcName, reqArray, successcb, errorcb) => FetchAddSectionPermission(dispatch, id, funcName, reqArray, successcb, errorcb),
   };
 }
