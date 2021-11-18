@@ -7,6 +7,7 @@ buildscript {
         compileSdkVersion = 29
         targetSdkVersion = 29
         ndkVersion = "20.1.5948944"
+        androidXCore = "1.6.0"
     }
     repositories {
         google()
@@ -36,3 +37,4 @@ allprojects {
         maven { url 'https://www.jitpack.io' }
     }
 }
+

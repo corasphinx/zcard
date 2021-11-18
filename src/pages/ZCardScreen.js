@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { StyleSheet, TouchableOpacity, Image, Dimensions, SafeAreaView, KeyboardAvoidingView, Linking, Platform, TextInput } from 'react-native';
+import { StyleSheet, TouchableOpacity, Image, Dimensions, SafeAreaView, KeyboardAvoidingView, Linking, Platform, TextInput, ActivityIndicator } from 'react-native';
 import {
   Block,
   Button,
@@ -13,7 +13,7 @@ import {
 import AwesomeLoading from 'react-native-awesome-loading';
 import Toast from 'react-native-toast-message';
 import Modal from 'react-native-modal';
-import PdfThumbnail from "react-native-pdf-thumbnail";
+import Pdf from 'react-native-pdf';
 import HTMLView from 'react-native-htmlview';
 import { Collapse, CollapseHeader, CollapseBody } from 'accordion-collapse-react-native';
 import { WebView } from 'react-native-webview';
@@ -232,6 +232,13 @@ class ZCardScreen extends React.Component {
                               newSection.font_color = ZCard.force_font_color == 0 && Zmodule_Data[0].tab_font_color ? Zmodule_Data[0].tab_font_color : ZCard.card_font_color;
                               newSection.name = Zmodule_Data[0].section_title;
                               newSection.permalink = Zmodule_Info[0]._permalink;
+                              newSection.section_content = Zmodule_Data[0].section_content;
+                              // if (Zmodule_Data[0].pdf_url)
+                              // newSection.pdf_url = await PdfThumbnail.generate(Zmodule_Data[0].pdf_url, 0);
+                              // else
+                              //   newSection.pdf_url = '';
+                              newSection.pdf_url = Zmodule_Data[0].pdf_url;
+                              // console.info(newSection.pdf_url)
 
                               switch (section.permalink) {
                                 case 'market-section':
@@ -582,6 +589,40 @@ class ZCardScreen extends React.Component {
         </Block>
       </Block>);
   }
+  renderHtml = (section) => {
+    return <Block>
+      <HTMLView
+        style={{ padding: 10 }}
+        value={section.section_content}
+      />
+    </Block>
+  }
+  renderPDF = (section) => {
+
+    if (section.pdf_url != '')
+      return <Block>
+        <Text size={18} color={colors.primary}>{section.section_content}</Text>
+        <Block center>
+          <Pdf
+            source={{ uri: section.pdf_url }}
+            // onLoadComplete={(numberOfPages, filePath) => {
+            //   console.log(`Number of pages: ${numberOfPages}`);
+            // }}
+            // onPageChanged={(page, numberOfPages) => {
+            //   console.log(`Current page: ${page}`);
+            // }}
+            // onError={(error) => {
+            //   console.log(error);
+            // }}
+            // onLoadProgress={(pro) => {
+            //   <Text>{pro*100}</Text>
+            // }}
+            renderActivityIndicator={() => <ActivityIndicator size="large" color="green" animating={true} />}
+            style={styles.PDFImage}
+          />
+        </Block>
+      </Block>
+  }
 
   renderSectionHTML = (section) => {
     switch (section.permalink) {
@@ -591,6 +632,10 @@ class ZCardScreen extends React.Component {
         return this.renderBusinessSearch(section);
       case 'job-opening':
         return this.renderJopOpening(section);
+      case 'html-section':
+        return this.renderHtml(section);
+      case 'pdf-section':
+        return this.renderPDF(section);
       default:
         break;
     }
@@ -629,7 +674,7 @@ class ZCardScreen extends React.Component {
             <Image
               source={PdfThumbnail.generate(section.pdf_url, 0)}
               resizeMode="contain"
-              style={styles.thumbnailPDFImage}
+              style={styles.PDFImage}
             />
           </Block>} */}
           {section.friendly_id == 'facebook_embed' && section.general_value != null && <Block>
@@ -908,9 +953,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     paddingLeft: 8
   },
-  thumbnailPDFImage: {
-    width: wp(40),
-    height: wp(60),
+  PDFImage: {
+    width: wp(60),
+    height: wp(90),
   },
   businessImage: {
     width: wp(20),
