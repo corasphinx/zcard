@@ -8,6 +8,7 @@ import Toast from 'react-native-toast-message';
 import { colors, commonStyles } from '../../../styles';
 import { hostname } from '../../../constant';
 import {
+  CallClassFunction,
   CallController
 } from '../../../redux/actions';
 const { width, height } = Dimensions.get('window');
@@ -45,6 +46,47 @@ class InstagramEmbedScreen extends Component {
     };
   }
 
+  componentDidMount = () => {
+    const { section } = this.props.route.params;
+    if (section) {
+      const { selectedZCard } = this.props;
+      this.props.callClassFunction(
+        'Zmodule',
+        'info',
+        [section.general_value],
+        (Zmodule_Info) => {
+
+          // fetch Zmodule_Data
+          if (Zmodule_Info) {
+
+            this.props.callClassFunction(
+              'Zmodule',
+              'select_zmodule_data',
+              [{
+                _permalink: Zmodule_Info[0]._permalink,
+                zcard: selectedZCard.id,
+                section: section.id
+              }],
+              (Zmodule_Data) => {
+                if (Zmodule_Data) {
+                  this.setState({ 
+                    url:Zmodule_Data[0].url,
+                   })
+                }
+              },
+            );
+          }
+        }
+      );
+
+      this.setState({
+        section_title: section.name,
+        tab_color: section.tab_color,
+        tab_font_color: section.tab_font_color,
+      });
+    }
+  }
+
   renderScreens = ({ item, index }) => {
     switch (item.index) {
       case 0:
@@ -66,8 +108,7 @@ class InstagramEmbedScreen extends Component {
   save = () => {
     this.setState({ saving: true });
     const { selectedZCard } = this.props;
-    const { product } = this.props.route.params;
-    const { section_title, url, tab_color, tab_font_color } = this.state;
+    const { product, section } = this.props.route.params;
 
     let validation = this.isValidate();
     if (validation != '') {
@@ -81,6 +122,7 @@ class InstagramEmbedScreen extends Component {
       return;
     }
 
+    if(!section){
     // add zmodule
     this.props.callController(
       '/controllers/Zcard/add_zmodule_section.php',
@@ -95,66 +137,75 @@ class InstagramEmbedScreen extends Component {
         const section = params[6];
         let page = params[7];
 
-        // save title
+        this.saveSection(identifier, zcard, section, page);
+      },
+      (msg) => {
+        this.setState({ saving: false });
+        Toast.show({
+          type: 'error',
+          position: 'top',
+          text1: 'Error',
+          text2: msg + ' 😥'
+        });
+      },
+      true
+    );
+    }else{
+      this.saveSection(section.general_value, selectedZCard.id, section.id, 1);
+    }
+  }
+
+  saveSection = (identifier, zcard, section, page) => {
+    const { section_title, url, tab_color, tab_font_color } = this.state;
+    // save title
+    this.props.callController(
+      `/zmodule_files/${identifier}/controllers/${page}.php`,
+      {
+        section_title,
+        zcard,
+        section
+      },
+      (msg) => {
+        page++;
+        // save URL
         this.props.callController(
           `/zmodule_files/${identifier}/controllers/${page}.php`,
           {
-            section_title,
-            zcard,
-            section
+            zcard: zcard,
+            section: section,
+            zmodule_identifier: identifier,
+            url: url
           },
           (msg) => {
             page++;
-            // save URL
+            // save Colors
             this.props.callController(
-              `/zmodule_files/${identifier}/controllers/${page}.php`,
+              `/zmodule_files/GLOBAL-ZMODULE-FILES/controllers/section-colors.php`,
               {
+                zmodule_identifier: identifier,
                 zcard: zcard,
                 section: section,
-                zmodule_identifier: identifier,
-                url: url
+                tab_color: tab_color,
+                tab_font_color: tab_font_color
               },
               (msg) => {
-                page++;
-                // save Colors
+                // complete saving
                 this.props.callController(
-                  `/zmodule_files/GLOBAL-ZMODULE-FILES/controllers/section-colors.php`,
+                  '/zmodule_files/mark_section_complete.php',
                   {
-                    zmodule_identifier: identifier,
-                    zcard: zcard,
-                    section: section,
-                    tab_color: tab_color,
-                    tab_font_color: tab_font_color
+                    section
                   },
                   (msg) => {
-                    // complete saving
-                    this.props.callController(
-                      '/zmodule_files/mark_section_complete.php',
-                      {
-                        section
-                      },
-                      (msg) => {
-                        this.setState({ saving: false });
-                        Toast.show({
-                          type: 'success',
-                          position: 'top',
-                          text1: 'Success',
-                          text2: msg + ' 🎊'
-                        });
-                        setTimeout(() => {
-                          this.props.navigation.pop(2);
-                        }, 2000);
-                      },
-                      (msg) => {
-                        this.setState({ saving: false });
-                        Toast.show({
-                          type: 'error',
-                          position: 'top',
-                          text1: 'Error',
-                          text2: msg + ' 😥'
-                        });
-                      },
-                    )
+                    this.setState({ saving: false });
+                    Toast.show({
+                      type: 'success',
+                      position: 'top',
+                      text1: 'Success',
+                      text2: msg + ' 🎊'
+                    });
+                    setTimeout(() => {
+                      this.props.navigation.pop(2);
+                    }, 2000);
                   },
                   (msg) => {
                     this.setState({ saving: false });
@@ -176,7 +227,7 @@ class InstagramEmbedScreen extends Component {
                   text2: msg + ' 😥'
                 });
               },
-            );
+            )
           },
           (msg) => {
             this.setState({ saving: false });
@@ -187,7 +238,7 @@ class InstagramEmbedScreen extends Component {
               text2: msg + ' 😥'
             });
           },
-        )
+        );
       },
       (msg) => {
         this.setState({ saving: false });
@@ -198,7 +249,6 @@ class InstagramEmbedScreen extends Component {
           text2: msg + ' 😥'
         });
       },
-      true
     )
   }
 
@@ -363,6 +413,7 @@ function mapStateToProps(state) {
 function mapDispatchToProps(dispatch) {
   return {
     callController: (controller, req, successcb, errorcb, getData) => CallController(controller, req, successcb, errorcb, getData),
+    callClassFunction: (className, funcName, reqArray, successcb, errorcb) => CallClassFunction(className, funcName, reqArray, successcb, errorcb),
   };
 }
 export default connect(

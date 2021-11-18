@@ -233,12 +233,7 @@ class ZCardScreen extends React.Component {
                               newSection.name = Zmodule_Data[0].section_title;
                               newSection.permalink = Zmodule_Info[0]._permalink;
                               newSection.section_content = Zmodule_Data[0].section_content;
-                              // if (Zmodule_Data[0].pdf_url)
-                              // newSection.pdf_url = await PdfThumbnail.generate(Zmodule_Data[0].pdf_url, 0);
-                              // else
-                              //   newSection.pdf_url = '';
                               newSection.pdf_url = Zmodule_Data[0].pdf_url;
-                              // console.info(newSection.pdf_url)
 
                               switch (section.permalink) {
                                 case 'market-section':
