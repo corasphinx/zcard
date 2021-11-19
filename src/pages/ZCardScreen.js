@@ -642,8 +642,7 @@ class ZCardScreen extends React.Component {
       <Collapse
         // isExpanded={true}
         key={section.id}
-        style={{ marginHorizontal: 10, marginVertical: 5 }}
-
+        style={{ marginHorizontal: 10, }}
       >
         <CollapseHeader>
           <Block style={[commonStyles.collapseTitle, commonStyles.shadow, { backgroundColor: getTabColor(section.tab_color), alignItems: 'flex-start' }]}>
